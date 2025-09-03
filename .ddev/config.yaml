@@ -14,7 +14,7 @@ use_dns_when_possible: true
 composer_version: "2"
 web_environment: 
   - PLATFORM_PROJECT=ct5b4hzofqk52
-  - PLATFORM_ENVIRONMENT=main
+  - PLATFORM_ENVIRONMENT=push
 
 corepack_enable: true
 
