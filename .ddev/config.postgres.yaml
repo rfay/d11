@@ -3,4 +3,4 @@ database:
     type: postgres
     version: "17"
 web_environment:
-  - PLATFORM_ENVIRONMENT=postgres
+  - PLATFORM_ENVIRONMENT=d11-postgres
