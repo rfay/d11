@@ -16,10 +16,10 @@
     ],
     "require": {
         "composer/installers": "^2.0",
-        "drupal/core-composer-scaffold": "^11.0",
+        "drupal/core-composer-scaffold": "11.x-dev@dev",
         "drupal/core-dev": "^11.1",
-        "drupal/core-project-message": "^11.0",
-        "drupal/core-recommended": "^11.0",
+        "drupal/core-project-message": "11.x-dev@dev",
+        "drupal/core-recommended": "11.x-dev@dev",
         "drupal/memcache": "^2.7",
         "drupal/redis": "^1.10",
         "drupal/search_api_opensearch": "^2.4",
@@ -30,7 +30,7 @@
     "conflict": {
         "drupal/drupal": "*"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "allow-plugins": {

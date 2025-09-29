@@ -16,17 +16,16 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 // cspell:ignore merhaba siema xsiemax
-
 /**
  * Tests Entity Query functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityQueryTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -453,6 +452,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     // As we do not have any conditions, here are the possible colors and
     // language codes, already in order, with the first occurrence of the
     // entity id marked with *:
+
     // 8  NULL pl *
     // 12 NULL pl *
 
