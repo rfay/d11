@@ -16,16 +16,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class QueryParamBuilder {
 
-  /**
-   * The default query offset.
-   */
-  const DEFAULT_OFFSET = 0;
-
-  /**
-   * The default query limit.
-   */
-  const DEFAULT_LIMIT = 10;
-
   public function __construct(
     #[Autowire(service: 'search_api.fields_helper')]
     protected FieldsHelperInterface $fieldsHelper,
@@ -66,8 +56,12 @@ class QueryParamBuilder {
     $body = [];
 
     // Set the size and from parameters.
-    $body['from'] = $query->getOption('offset') ?? self::DEFAULT_OFFSET;
-    $body['size'] = $query->getOption('limit') ?? self::DEFAULT_LIMIT;
+    if (($offset = $query->getOption('offset')) !== NULL) {
+      $body['from'] = $offset;
+    }
+    if (($limit = $query->getOption('limit')) !== NULL) {
+      $body['size'] = $limit;
+    }
 
     // Sort.
     $sort = $this->sortBuilder->getSortSearchQuery($query);

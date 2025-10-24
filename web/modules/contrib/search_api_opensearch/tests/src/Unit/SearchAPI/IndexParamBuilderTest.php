@@ -7,6 +7,7 @@ namespace Drupal\Tests\search_api_opensearch\Unit\SearchAPI;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\Field;
@@ -47,9 +48,10 @@ class IndexParamBuilderTest extends UnitTestCase {
 
     $event = $this->prophesize(IndexParamsEvent::class);
     $eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
+    $moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
     $eventDispatcher->dispatch(Argument::any())->willReturn($event->reveal());
 
-    $paramBuilder = new IndexParamBuilder($fieldsHelper, $eventDispatcher->reveal());
+    $paramBuilder = new IndexParamBuilder($fieldsHelper, $eventDispatcher->reveal(), $moduleHandler->reveal());
 
     $index = $this->prophesize(IndexInterface::class);
     $indexId = "index_" . $this->randomMachineName();

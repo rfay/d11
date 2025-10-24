@@ -6,6 +6,8 @@ namespace Drupal\Tests\search_api_opensearch\Kernel;
 
 use Drupal\search_api\Entity\Index;
 use Drupal\search_api\Entity\Server;
+use Drupal\search_api\IndexInterface;
+use Drupal\search_api_opensearch\Plugin\search_api\backend\OpenSearchBackend;
 use OpenSearch\Common\Exceptions\NoNodesAvailableException;
 
 /**
@@ -18,9 +20,7 @@ trait OpenSearchTestTrait {
    */
   protected function serverAvailable(): bool {
     try {
-      /** @var \Drupal\search_api\Entity\Server $server */
-      $server = Server::load($this->serverId);
-      if ($server->getBackend()->isAvailable()) {
+      if ($this->getBackend()->isAvailable()) {
         return TRUE;
       }
     }
@@ -31,12 +31,23 @@ trait OpenSearchTestTrait {
   }
 
   /**
-   * Retrieves the search index used by this test.
-   *
-   * @return \Drupal\search_api\IndexInterface|null
-   *   The search index.
+   * Gets the search server.
    */
-  protected function getIndex() {
+  protected function getServer(): ?Server {
+    return Server::load($this->serverId);
+  }
+
+  /**
+   * Retrieves the search backend used by this test.
+   */
+  protected function getBackend(): ?OpenSearchBackend {
+    return $this->getServer()?->getBackend();
+  }
+
+  /**
+   * Retrieves the search index used by this test.
+   */
+  protected function getIndex(): ?IndexInterface {
     return Index::load($this->indexId);
   }
 
@@ -46,9 +57,7 @@ trait OpenSearchTestTrait {
    * @throws \Drupal\search_api\SearchApiException
    */
   protected function recreateIndex() {
-    $server = Server::load($this->serverId);
-    /** @var \Drupal\search_api_opensearch\Plugin\search_api\backend\OpenSearchBackend $backend */
-    $backend = $server->getBackend();
+    $backend = $this->getBackend();
     $index = $this->getIndex();
     if (!isset($index)) {
       $this->fail("Failed to load index");
@@ -66,10 +75,7 @@ trait OpenSearchTestTrait {
    * This ensures all indexed data is available to searches.
    */
   protected function refreshIndices(): void {
-    $this->getIndex()
-      ->getServerInstance()
-      ->getBackend()
-      ->getConnector()
+    $this->getBackend()
       ->getClient()
       ->indices()
       ->refresh();

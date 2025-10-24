@@ -24,6 +24,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
+    'contact',
     'content_translation',
     'datetime_range',
     'language',
@@ -56,7 +57,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
 
-    $this->expectedLoggedErrors = 39;
+    $this->expectedLoggedErrors = 41;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -82,7 +83,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // The 'standard' profile provides the 'comment' comment type, and the
       // migration creates 12 comment types, one per node type.
       'comment_type' => 14,
-      'contact_form' => 5,
+      'contact_form' => 4,
       'contact_message' => 0,
       'configurable_language' => 5,
       'editor' => 2,

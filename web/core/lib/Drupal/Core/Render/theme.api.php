@@ -5,6 +5,8 @@
  * Hooks and documentation related to the theme and render system.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
+
 /**
  * @defgroup themeable Theme system overview
  * @{
@@ -538,7 +540,7 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   $form['toggle_breadcrumb'] = [
     '#type' => 'checkbox',
     '#title' => t('Display the breadcrumb'),
-    '#default_value' => theme_get_setting('features.breadcrumb'),
+    '#default_value' => \Drupal::service(ThemeSettingsProvider::class)->getSetting('features.breadcrumb'),
     '#description'   => t('Show a trail of links from the homepage to the current page.'),
   ];
 }
@@ -1317,21 +1319,18 @@ function hook_theme($existing, $type, $theme, $path): array {
  *
  * For example:
  * @code
- * $theme_registry['block_content_add_list'] = [
- *   'template' => 'block-content-add-list',
+ * $theme_registry['entity_add_list'] = [
+ *   'template' => 'entity-add-list',
  *   'path' => 'core/themes/claro/templates',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'includes' => [
- *     0 => 'core/modules/block_content/block_content.pages.inc',
- *   ],
  *   'variables' => [
- *     'content' => NULL,
+ *     'bundles' => NULL,
  *   ],
  *   'preprocess functions' => [
- *     1 => 'template_preprocess_block_content_add_list',
+ *     1 => 'template_preprocess_entity_add_list',
  *     2 => 'contextual_preprocess',
- *     3 => 'claro_preprocess_block_content_add_list',
+ *     3 => 'claro_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode

@@ -17,7 +17,8 @@ function search_api_opensearch_update_9201() {
   foreach ($search_api_servers as $search_api_server) {
     $backend = $search_api_server->getBackend();
     if ($backend instanceof OpenSearchBackend) {
-      $connector = $backend->getConnector();
+      $configuration = $backend->getConfiguration();
+      $connector = $backend->getConnector($configuration['connector'], $configuration['connector_config']);
       if ($connector instanceof StandardConnector) {
         $backend_config = $search_api_server->getBackendConfig();
         $backend_config['connector_config']['ssl_verification'] = TRUE;

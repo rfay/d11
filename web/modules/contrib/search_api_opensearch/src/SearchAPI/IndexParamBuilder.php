@@ -2,6 +2,7 @@
 
 namespace Drupal\search_api_opensearch\SearchAPI;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Item\FieldInterface;
 use Drupal\search_api\Item\ItemInterface;
@@ -20,6 +21,7 @@ class IndexParamBuilder {
     #[Autowire(service: 'search_api.fields_helper')]
     protected FieldsHelperInterface $fieldsHelper,
     protected EventDispatcherInterface $eventDispatcher,
+    protected ModuleHandlerInterface $moduleHandler,
   ) {
   }
 
@@ -47,6 +49,7 @@ class IndexParamBuilder {
         $field_type = $field->getType();
         if (!empty($field->getValues())) {
           $values = $this->buildFieldValues($field, $field_type);
+          $this->moduleHandler->alter('index_param_value', $values, $field);
           $data[$field->getFieldIdentifier()] = $values;
         }
       }

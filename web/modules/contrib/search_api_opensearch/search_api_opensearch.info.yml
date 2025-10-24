@@ -7,7 +7,7 @@ type: module
 dependencies:
   - search_api:search_api
 
-# Information added by Drupal.org packaging script on 2025-06-17
-version: '2.4.2'
+# Information added by Drupal.org packaging script on 2025-09-30
+version: '2.4.4'
 project: 'search_api_opensearch'
-datestamp: 1750135575
+datestamp: 1759191424

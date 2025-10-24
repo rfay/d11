@@ -13,6 +13,7 @@ use Drupal\search_api\Utility\FieldsHelperInterface;
 use Drupal\search_api_opensearch\Analyser\AnalyserInterface;
 use Drupal\search_api_opensearch\Analyser\AnalyserManager;
 use Drupal\search_api_opensearch\Event\AlterSettingsEvent;
+use Drupal\search_api_opensearch\Event\BeforeIndexCreateEvent;
 use Drupal\search_api_opensearch\Event\IndexCreatedEvent;
 use Drupal\search_api_opensearch\SearchAPI\Query\QueryParamBuilder;
 use Drupal\search_api_opensearch\SearchAPI\Query\QueryResultParser;
@@ -215,10 +216,19 @@ class BackendClient implements BackendClientInterface {
       return;
     }
 
+    // Handle settings that can only be set on index creation.
+    $settings = [];
+    $event = new BeforeIndexCreateEvent($settings, $index);
+    $this->eventDispatcher->dispatch($event);
+    $settings = $event->getSettings();
+
     try {
-      $this->client->indices()->create([
-        'index' => $indexId,
-      ]);
+      $params = ['index' => $indexId];
+      if (!empty($settings)) {
+        $params['body']['settings'] = $settings;
+      }
+      $this->client->indices()->create($params);
+
       $this->updateSettings($index);
       $this->updateFieldMapping($index);
       $event = new IndexCreatedEvent($index);
