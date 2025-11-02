@@ -10,6 +10,10 @@ database:
     version: "11.8"
 fail_on_hook_fail: true
 hooks:
+    pre-share:
+      - exec: echo "yup, happened on pre-share"
+    post-share:
+      - exec: echo "post-share happened"
     post-start:
         - composer: install
 dbimage_extra_packages: [sudo]
