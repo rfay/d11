@@ -23,6 +23,8 @@ web_environment:
     - PLATFORM_PROJECT=ct5b4hzofqk52
     - PLATFORM_ENVIRONMENT=main
 corepack_enable: true
+# ngrok for free rfay account
+ngrok_args: "--domain nonportentously-caulicolous-cedrick.ngrok-free.dev"
 
 # Key features of DDEV's config.yaml:
 
