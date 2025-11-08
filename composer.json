@@ -21,7 +21,6 @@
         "drupal/core-project-message": "11.x-dev@dev",
         "drupal/core-recommended": "11.x-dev@dev",
         "drupal/memcache": "^2.7",
-        "drupal/redis": "^1.10",
         "drupal/search_api_opensearch": "^2.4",
         "drupal/search_api_solr": "^4.3",
         "drush/drush": "^13.6",
