@@ -7,15 +7,15 @@ additional_hostnames: []
 additional_fqdns: []
 database:
     type: mariadb
-    version: "11.8"
+    version: "11.4"
 fail_on_hook_fail: true
 hooks:
     pre-share:
-      - exec: echo "yup, happened on pre-share"
+    - exec-host: 'echo "pre-share: $DDEV_SHARE_URL"'
     post-share:
-      - exec: echo "post-share happened"
+      - exec-host: echo "post-share happened"
     post-start:
-        - composer: install
+      - composer: install
 dbimage_extra_packages: [sudo]
 use_dns_when_possible: true
 composer_version: "2"
