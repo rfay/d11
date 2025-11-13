@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\search_api_opensearch\Plugin\OpenSearch\Analyser;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\search_api_opensearch\Analyser\AnalyserBase;
+use Drupal\search_api_opensearch\Attribute\OpenSearchAnalyser;
 
 /**
  * Defines an N-gram analyser.
- *
- * @OpenSearchAnalyser(
- *   id = \Drupal\search_api_opensearch\Plugin\OpenSearch\Analyser\Ngram::PLUGIN_ID,
- *   label = @Translation("N-gram analyzer"),
- * )
  */
+#[OpenSearchAnalyser(
+  id: Ngram::PLUGIN_ID,
+  label: new TranslatableMarkup("N-gram analyzer"),
+)]
 final class Ngram extends AnalyserBase {
 
   /**

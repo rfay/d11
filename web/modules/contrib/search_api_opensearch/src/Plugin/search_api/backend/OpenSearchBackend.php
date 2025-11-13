@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\search_api_opensearch\Plugin\search_api\backend;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -7,7 +9,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\search_api\Attribute\SearchApiBackend;
 use Drupal\search_api\Backend\BackendPluginBase;
 use Drupal\search_api\IndexInterface;
 use Drupal\search_api\Query\QueryInterface;
@@ -23,13 +27,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides an OpenSearch backend for Search API.
- *
- * @SearchApiBackend(
- *   id = "opensearch",
- *   label = @Translation("OpenSearch"),
- *   description = @Translation("Provides an OpenSearch backend.")
- * )
  */
+#[SearchApiBackend(
+  id: 'opensearch',
+  label: new TranslatableMarkup("OpenSearch"),
+  description: new TranslatableMarkup("Provides an OpenSearch backend."),
+)]
 class OpenSearchBackend extends BackendPluginBase implements PluginFormInterface {
 
   use DependencySerializationTrait {

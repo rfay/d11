@@ -6,6 +6,8 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\search_api_opensearch\Attribute\OpenSearchConnector;
 use Drupal\search_api_opensearch\Connector\OpenSearchConnectorInterface;
 use Drupal\search_api_opensearch\Event\ClientOptionsEvent;
 use OpenSearch\Client;
@@ -15,13 +17,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a standard OpenSearch connector.
- *
- * @OpenSearchConnector(
- *   id = "standard",
- *   label = @Translation("Standard"),
- *   description = @Translation("A standard connector without authentication")
- * )
  */
+#[OpenSearchConnector(
+  id: "standard",
+  label: new TranslatableMarkup("Standard"),
+  description: new TranslatableMarkup("A standard connector without authentication"),
+)]
 class StandardConnector extends PluginBase implements OpenSearchConnectorInterface, ContainerFactoryPluginInterface {
 
   public function __construct(

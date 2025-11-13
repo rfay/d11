@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\search_api_aws_signature_connector\Plugin\OpenSearch\Connector;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\search_api_opensearch\Attribute\OpenSearchConnector;
 use Drupal\search_api_opensearch\Plugin\OpenSearch\Connector\StandardConnector;
 
 /**
  * Provides an OpenSearch connector using AWS Signature.
- *
- * @OpenSearchConnector(
- *   id = "aws_signature",
- *   label = @Translation("AWS Signature"),
- *   description = @Translation("OpenSearch connector with AWS Signature."),
- *   depends = { "search_api_opensearch" }
- * )
  */
+#[OpenSearchConnector(
+  id: "aws_signature",
+  label: new TranslatableMarkup("AWS Signature"),
+  description: new TranslatableMarkup("OpenSearch connector with AWS Signature."),
+)]
 class AwsSignatureConnector extends StandardConnector {
 
   /**

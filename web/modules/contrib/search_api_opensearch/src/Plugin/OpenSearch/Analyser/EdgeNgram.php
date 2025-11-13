@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\search_api_opensearch\Plugin\OpenSearch\Analyser;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\search_api_opensearch\Analyser\AnalyserBase;
+use Drupal\search_api_opensearch\Attribute\OpenSearchAnalyser;
 
 /**
  * Defines an Edge N-gram analyser.
- *
- * @OpenSearchAnalyser(
- *   id = \Drupal\search_api_opensearch\Plugin\OpenSearch\Analyser\EdgeNgram::PLUGIN_ID,
- *   label = @Translation("Edge N-gram analyzer"),
- * )
  */
+#[OpenSearchAnalyser(
+  id: EdgeNgram::PLUGIN_ID,
+  label: new TranslatableMarkup("Edge N-gram analyzer"),
+)]
 final class EdgeNgram extends AnalyserBase {
 
   /**

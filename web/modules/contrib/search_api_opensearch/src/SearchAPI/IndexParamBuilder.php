@@ -110,7 +110,7 @@ class IndexParamBuilder {
       }
       $values[] = match ($field_type) {
         'string' => (string) $value,
-        'boolean' => (boolean) $value,
+        'boolean' => (bool) $value,
         default => $value,
       };
     }

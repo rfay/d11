@@ -1,29 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\search_api_opensearch\Plugin\search_api\processor;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\search_api\Attribute\SearchApiProcessor;
 use Drupal\search_api\Processor\ProcessorPluginBase;
 
 /**
  * Add date ranges to the index.
- *
- * @SearchApiProcessor(
- *   id = "search_api_opensearch_date_range",
- *   label = @Translation("Date ranges"),
- *   description = @Translation("Date ranges."),
- *   stages = {
- *     "preprocess_index" = 0,
- *   },
- *   locked = true,
- *   hidden = true,
- * )
  */
+#[SearchApiProcessor(
+  id: "search_api_opensearch_date_range",
+  label: new TranslatableMarkup("Date ranges"),
+  description: new TranslatableMarkup("Date ranges."),
+  stages: [
+    "preprocess_index" => 0,
+  ],
+  locked: TRUE,
+  hidden: TRUE,
+)]
 class DateRange extends ProcessorPluginBase {
 
   /**
    * {@inheritdoc}
    */
-  public function preprocessIndexItems(array $items) {
+  public function preprocessIndexItems(array $items): void {
     foreach ($items as $item) {
       foreach ($item->getFields() as $field) {
         if ('search_api_opensearch_date_range' == $field->getType()) {
