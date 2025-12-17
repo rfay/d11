@@ -1,3 +1,4 @@
+name: d11
 type: drupal11
 docroot: web
 php_version: "8.5"
@@ -19,7 +20,6 @@ hooks:
 dbimage_extra_packages: [sudo]
 use_dns_when_possible: true
 ngrok_args: --domain nonportentously-caulicolous-cedrick.ngrok-free.dev
-share_default_provider: ngrok
 composer_version: "2"
 web_environment:
     - PLATFORM_PROJECT=ct5b4hzofqk52
@@ -101,7 +101,7 @@ corepack_enable: true
 #   - preview
 #   - snapshot
 # Alternatively, an explicit Composer version may be specified, for example "2.2.18".
-# To reinstall Composer after the image was built, run "ddev debug rebuild".
+# To reinstall Composer after the image was built, run "ddev utility rebuild".
 
 # nodejs_version: "24"
 # change from the default system Node.js version to any other version.
