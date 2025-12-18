@@ -2052,12 +2052,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core.git",
-                "reference": "d64a51039bb612480fed0a9aa8485e45910fc22b"
+                "reference": "5b10483578433dc933f3aff8d667b69967e76783"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/d64a51039bb612480fed0a9aa8485e45910fc22b",
-                "reference": "d64a51039bb612480fed0a9aa8485e45910fc22b",
+                "url": "https://api.github.com/repos/drupal/core/zipball/5b10483578433dc933f3aff8d667b69967e76783",
+                "reference": "5b10483578433dc933f3aff8d667b69967e76783",
                 "shasum": ""
             },
             "require": {
@@ -2219,7 +2219,7 @@
             "support": {
                 "source": "https://github.com/drupal/core/tree/11.x"
             },
-            "time": "2025-12-16T18:28:43+00:00"
+            "time": "2025-12-18T12:59:30+00:00"
         },
         {
             "name": "drupal/core-composer-scaffold",
@@ -2274,7 +2274,7 @@
         },
         {
             "name": "drupal/core-dev",
-            "version": "11.3.0",
+            "version": "11.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drupal/core-dev.git",
@@ -2324,7 +2324,7 @@
             ],
             "description": "require-dev dependencies from drupal/drupal; use in addition to drupal/core-recommended to run tests from drupal/core.",
             "support": {
-                "source": "https://github.com/drupal/core-dev/tree/11.3.0"
+                "source": "https://github.com/drupal/core-dev/tree/11.3.1"
             },
             "time": "2025-12-15T09:20:07+00:00"
         },
