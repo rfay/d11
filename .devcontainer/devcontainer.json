@@ -1,9 +1,10 @@
 {
     "image": "mcr.microsoft.com/devcontainers/base:debian-12",
     "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {
-            "version": "latest"
-        },
+//        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+//            "version": "latest"
+//        },
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
         "ghcr.io/ddev/ddev/install-ddev:latest": {},
         "ghcr.io/devcontainers/features/common-utils:2": {
           "username": "rfay",
@@ -14,5 +15,7 @@
   "remoteUser": "rfay",
   "containerUser": "rfay",
   "updateRemoteUserUID": true,
-  "postCreateCommand": "echo 'it should all be set up'"
+  "postCreateCommand": "echo 'it should all be set up'",
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached",
+  "workspaceFolder": "${localWorkspaceFolder}"
 }
