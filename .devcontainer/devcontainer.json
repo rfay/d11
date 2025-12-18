@@ -4,7 +4,15 @@
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
             "version": "latest"
         },
-        "ghcr.io/ddev/ddev/install-ddev:latest": {}
+        "ghcr.io/ddev/ddev/install-ddev:latest": {},
+        "ghcr.io/devcontainers/features/common-utils:2": {
+          "username": "rfay",
+          "userUid": "501",
+//          "userGid": "20"
+        }
     },
-    "postCreateCommand": "echo 'it should all be set up'"
+  "remoteUser": "rfay",
+  "containerUser": "rfay",
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "echo 'it should all be set up'"
 }
