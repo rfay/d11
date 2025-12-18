@@ -1,21 +1,13 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/base:debian-12",
-    "features": {
-//        "ghcr.io/devcontainers/features/docker-in-docker:2": {
-//            "version": "latest"
-//        },
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-        "ghcr.io/ddev/ddev/install-ddev:latest": {},
-        "ghcr.io/devcontainers/features/common-utils:2": {
-          "username": "rfay",
-          "userUid": "501",
-//          "userGid": "20"
-        }
+  "image": "mcr.microsoft.com/devcontainers/base:debian-12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest"
     },
-  "remoteUser": "rfay",
-  "containerUser": "rfay",
-  "updateRemoteUserUID": true,
-  "postCreateCommand": "echo 'it should all be set up'",
-  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=cached",
-  "workspaceFolder": "${localWorkspaceFolder}"
+    "ghcr.io/ddev/ddev/install-ddev:latest": {}
+  },
+  "containerEnv": {
+    "XDG_CONFIG_HOME": "/workspaces/.config"
+  },
+  "postCreateCommand": "echo 'it should all be set up'"
 }
