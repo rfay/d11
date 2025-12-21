@@ -1,0 +1,48 @@
+# DDEV Additional Service: Hardened MySQL 8.4
+# This service runs alongside the default database service
+
+services:
+  mysql84:
+    container_name: "ddev-${DDEV_SITENAME}-mysql84"
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    image: ddev-mysql84-${DDEV_SITENAME}-built
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+    restart: "no"
+    ports:
+      # Use different port from main db (3306)
+      - "127.0.0.1:3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=db
+      - MYSQL_USER=db
+      - MYSQL_PASSWORD=db
+      - TZ=America/Denver
+    volumes:
+      # Dedicated volume for this MySQL instance
+      - mysql84-data:/var/lib/mysql
+      # Mount project for configuration access
+      - .:/mnt/ddev_config:ro
+      # Snapshots directory
+      - ./mysql-snapshots:/mnt/snapshots
+    healthcheck:
+      test: ["CMD", "/healthcheck.sh"]
+      interval: 2s
+      timeout: 10s
+      retries: 30
+      start_period: 120s
+    networks:
+      - default
+    x-ddev:
+      describe-info: |
+        Hardened MySQL 8.4 service
+        Connect from host: mysql -h 127.0.0.1 -P 3307 -u root -proot
+        Connect from web: mysql -h mysql84 -u root -proot
+      describe-url-port: "3307:3306"
+
+volumes:
+  mysql84-data:
+    name: "${DDEV_SITENAME}-mysql84-data"
