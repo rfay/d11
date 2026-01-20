@@ -1,0 +1,17 @@
+{
+  "name": "D11 with DDEV HEAD",
+  "image": "mcr.microsoft.com/devcontainers/base:debian-12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "latest"
+    },
+    "../features/install-ddev": {}
+  },
+  "containerEnv": {
+    "DDEV_BUILD_FROM_SOURCE": "/tmp/ddev-source"
+  },
+  "onCreateCommand": "git clone --depth=1 https://github.com/ddev/ddev.git /tmp/ddev-source"
+}
