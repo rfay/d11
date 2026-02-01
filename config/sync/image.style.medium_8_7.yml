@@ -1,9 +1,9 @@
-uuid: 92e96504-6ba1-430c-9dd0-da9d520040c3
+uuid: 8312f4bb-af3f-440f-a8e3-712df1b49d8f
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: lgSUA5HXWFRaXbQaMyCMfWA9zQRgl6OL5rWIl_C7zjQ
+  default_config_hash: fz_jd_IqyOoRXApdI-PosCa96qsCMbrjoV7tU-8Fl_I
 name: medium_8_7
 label: 'Medium 8:7 (266x236)'
 effects:
@@ -17,7 +17,7 @@ effects:
       anchor: center-center
   622134fc-29c1-43d4-ba34-beffc0bc4e15:
     uuid: 622134fc-29c1-43d4-ba34-beffc0bc4e15
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

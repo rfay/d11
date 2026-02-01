@@ -1,4 +1,4 @@
-uuid: 9b0d4946-dcba-4dd1-94f6-b91c377951e9
+uuid: b5c311c8-e2dd-4386-a15f-52ed771f803f
 langcode: en
 status: true
 dependencies:
@@ -13,7 +13,7 @@ dependencies:
     module:
       - demo_umami_content
 _core:
-  default_config_hash: IkW5_SiJrLyjpht0MTFKFFUcnakHfT1AJaN0VTL4gn8
+  default_config_hash: '-ALuxERLU6GQkiZ_fuo7DFvSF6FteLze1BpArBwf6N4'
 id: umami_banner_recipes
 theme: umami
 region: banner_top

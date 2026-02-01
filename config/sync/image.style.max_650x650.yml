@@ -1,4 +1,4 @@
-uuid: 2ea1440d-955a-412d-a192-5238d4779457
+uuid: 3823adcf-a7f7-41e8-9981-2c7c4898366b
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     module:
       - responsive_image
 _core:
-  default_config_hash: 6yk3NkEk9S2cYUXpy1zvVqCIkoPej1aCbZ9N2fqcn2o
+  default_config_hash: ph9beVj6WWG9Mqp6ydebFHo95g0NwuDjspP8liKgpnE
 name: max_650x650
 label: 'Max 650x650'
 effects:
@@ -20,7 +20,7 @@ effects:
       upscale: false
   a4968ae1-83ac-420c-8e81-c571209daa44:
     uuid: a4968ae1-83ac-420c-8e81-c571209daa44
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

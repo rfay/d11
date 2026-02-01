@@ -1,9 +1,9 @@
-uuid: 6b8c0849-2f56-44dc-9747-2fd698ab85a1
+uuid: c1133fea-0ab3-4987-8c0e-2c573bb70604
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: _eqbuc2dY7HM5RQDDYiM-7YCZuWIrNX_6PaR2kXUVME
+  default_config_hash: 3cmeciVlCdgtYeOnIRpHJM1bPUOCYDqJCsWsW_om6uY
 name: square_small
 label: 'Square Small'
 effects:
@@ -17,7 +17,7 @@ effects:
       anchor: center-center
   dc9608c0-7510-4fbf-9474-028565687572:
     uuid: dc9608c0-7510-4fbf-9474-028565687572
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

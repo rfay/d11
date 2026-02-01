@@ -1,22 +1,22 @@
-uuid: 6aa9faee-9529-4cfa-872d-4653414c7f1e
+uuid: 3e6be822-2bfb-4ba3-92ec-66289864441b
 langcode: en
 status: true
 dependencies:
   config:
-    - node.type.page
+    - node.type.recipe
 _core:
-  default_config_hash: fPUEnm4T5zfZRr3ttDUqq7yCDd2uW3clWD-pvos4tlQ
-id: node.page.promote
+  default_config_hash: FmK0AhETThsUmMzGVCs2Rnpgjwr-MV2meli4Xdexxdc
+id: node.recipe.promote
 field_name: promote
 entity_type: node
-bundle: page
+bundle: recipe
 label: 'Promoted to front page'
 description: ''
 required: false
 translatable: false
 default_value:
   -
-    value: 0
+    value: 1
 default_value_callback: ''
 settings:
   on_label: 'On'

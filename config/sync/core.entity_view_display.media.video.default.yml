@@ -1,4 +1,4 @@
-uuid: d4efdcd5-f67b-449e-8c7f-5a85aee16bfe
+uuid: 7e64ae41-85d9-4ee1-a040-4c70afea70f8
 langcode: en
 status: true
 dependencies:
@@ -8,7 +8,7 @@ dependencies:
   module:
     - file
 _core:
-  default_config_hash: kE5GUyGHjdrBBmFjopZs92mC8zV_Ixw80gp_qwdaZBA
+  default_config_hash: kZfB2BvsuGthP-oadE8pCF-bxwTSZLtMjxnEK8xekQA
 id: media.video.default
 targetEntityType: media
 bundle: video
@@ -23,9 +23,9 @@ content:
       loop: false
       multiple_file_display_type: tags
       muted: false
+      playsinline: false
       width: 640
       height: 480
-      playsinline: false
     third_party_settings: {  }
     weight: 0
     region: content

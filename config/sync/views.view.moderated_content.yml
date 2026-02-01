@@ -1,18 +1,15 @@
-uuid: e351a0d7-1da0-437d-a955-668701591ff0
+uuid: 3e51c827-d769-4039-8f0d-77ef365d6872
 langcode: en
 status: true
 dependencies:
-  config:
-    - workflows.workflow.editorial
   module:
-    - content_moderation
     - node
     - user
   enforced:
     module:
       - content_moderation
 _core:
-  default_config_hash: fnzhO9h_2CooJpv_VNqRfr517XXSDKz2yIJ-WBgpeXs
+  default_config_hash: SeyUoUjWFNY3MNSth2i3GkQJlgDYe0GECc-zchRdQGQ
 id: moderated_content
 label: 'Moderated content'
 module: views

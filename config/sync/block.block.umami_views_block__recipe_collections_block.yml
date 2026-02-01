@@ -1,4 +1,4 @@
-uuid: acbe6687-92f0-4a13-9789-8d74034ce866
+uuid: 1773e5cd-a640-4e90-b9bc-508a0f45c165
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
   theme:
     - umami
 _core:
-  default_config_hash: rLgYDFYFOZvMqivqa3tBKA4mSvcypo4oTZKuZ9mMERc
+  default_config_hash: _KJuOVvXiIWo7rrsBLhD5PY85ZMizAACZZjkMPJ_FMs
 id: umami_views_block__recipe_collections_block
 theme: umami
 region: content_bottom

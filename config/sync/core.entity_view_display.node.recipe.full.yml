@@ -1,4 +1,4 @@
-uuid: ee4e2b0e-c3c0-48b6-a97f-c4225771b991
+uuid: 0987cb9e-d808-4290-933c-960b7acdbf02
 langcode: en
 status: true
 dependencies:
@@ -264,12 +264,12 @@ third_party_settings:
               provider: views
               context_mapping: {  }
               views_label: ''
-              items_per_page: none
+              items_per_page: null
             weight: 0
             additional: {  }
         third_party_settings: {  }
 _core:
-  default_config_hash: jYVlfgRy-bmEWo6qsQxal6mj5ae9BtqXyFHgHgd4uRM
+  default_config_hash: hpWD-KthbXWi-Sv_ThRx0hQvw0ALkmqOl-Q29_gmGps
 id: node.recipe.full
 targetEntityType: node
 bundle: recipe

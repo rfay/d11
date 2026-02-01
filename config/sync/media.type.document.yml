@@ -1,12 +1,12 @@
-uuid: 4b6115df-d310-4d1a-bc22-4789f3ea5389
+uuid: d0a7ab87-04d9-4a94-9d63-2200eaa48dbd
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: _D9q3XSnP6ik9we9UuoTvZsQKPuYNp_G9PfwVtWzgnQ
+  default_config_hash: QgF3JDg2h0tf2gaqzc4mNvlHttNkUpmxk1LZefP82hE
 id: document
 label: Document
-description: 'An uploaded file or document, such as a PDF.'
+description: 'A locally hosted document, such as a PDF file.'
 source: file
 queue_thumbnail_downloads: false
 new_revision: true

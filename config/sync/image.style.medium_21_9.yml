@@ -1,9 +1,9 @@
-uuid: 608c8309-f6d9-45ee-ae56-8cccc2d73079
+uuid: 638ff9a4-23c0-46c3-9241-e565fa12931a
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 4SLufbXGK1TrPv0iTVm5xjKk0_Yh-pCHHZORUlyurPk
+  default_config_hash: 7jG58GwI_e0slrHl9YvZvH7va1bDt6tcEKpRgkSL1N0
 name: medium_21_9
 label: 'Medium 21:9 (1024x440)'
 effects:
@@ -17,7 +17,7 @@ effects:
       anchor: center-center
   dd8d02b0-2ae5-4e0c-988f-730711911c49:
     uuid: dd8d02b0-2ae5-4e0c-988f-730711911c49
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

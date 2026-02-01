@@ -1,4 +1,4 @@
-uuid: c9f6a5f6-80fb-44dc-963e-9eb2a195ac8a
+uuid: 55c37664-344a-41f3-ba5b-f081b9d7199e
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     module:
       - responsive_image
 _core:
-  default_config_hash: xKhQKxv54Y_EkumqQ1Qm9Kq2PjvjALFpegD_AHx3pPk
+  default_config_hash: FXe2116jZDQQQW5ibBV0nUWdeLWG2vrOvUw56sFdN44
 name: max_1300x1300
 label: 'Max 1300x1300'
 effects:
@@ -20,7 +20,7 @@ effects:
       upscale: false
   45c1e8e2-700e-4300-b0b8-c219e91d256b:
     uuid: 45c1e8e2-700e-4300-b0b8-c219e91d256b
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

@@ -1,9 +1,9 @@
-uuid: 9711bdbe-2b00-4a39-967d-6dc299873468
+uuid: b896334b-5c65-47e5-a571-81b6231194a9
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: NB4fueGyoh8orkVPOhj5kbsNwzfLTTy3pKB_9wlO6cQ
+  default_config_hash: A-ml7MV-oYCWiHHIk1Pf6TwQI7Q9FGL7iHMibAmmEQI
 name: large_21_9_2x
 label: 'Large 21:9 2x (2880x1240)'
 effects:
@@ -17,7 +17,7 @@ effects:
       anchor: center-center
   20ec38fa-1f1c-422d-9fed-48ed96e3eb50:
     uuid: 20ec38fa-1f1c-422d-9fed-48ed96e3eb50
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

@@ -1,4 +1,4 @@
-uuid: 03a318ca-9b50-49d4-bc4b-121e888a6a37
+uuid: bf9a8e8c-f581-449c-b5ad-631fc3a3eb91
 langcode: en
 status: true
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
     module:
       - responsive_image
 _core:
-  default_config_hash: 4XE5d8aGOWbeELizGA0JnpG2RPt5mbQNvQGEG_3Qntw
+  default_config_hash: iMgFj3-tz-B_pfOShLGIy-u2w8Hxr-wo-Oh6KdIKEL0
 name: max_2600x2600
 label: 'Max 2600x2600'
 effects:
@@ -20,7 +20,7 @@ effects:
       upscale: false
   ecb160c9-df96-4b0b-9ef8-8ac74dd319f8:
     uuid: ecb160c9-df96-4b0b-9ef8-8ac74dd319f8
-    id: image_convert
+    id: image_convert_avif
     weight: 2
     data:
       extension: webp

@@ -1,4 +1,4 @@
-uuid: 16108d53-1a76-4176-83eb-18464ab2161c
+uuid: 653f101e-cf2d-43fd-bc4b-7beb6a1a1a40
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
   theme:
     - umami
 _core:
-  default_config_hash: 9SflLKjOukDutHBBc0A8bldXeitoSFwFyezQoYqiQxI
+  default_config_hash: stVz-qV9qOIT1JtWHXYPfuYiKQY2MGh_meBdU43hC6g
 id: umami_footer
 theme: umami
 region: footer
@@ -19,7 +19,7 @@ plugin: 'system_menu_block:footer'
 settings:
   id: 'system_menu_block:footer'
   label: 'Tell us what you think'
-  label_display: '1'
+  label_display: visible
   provider: system
   level: 1
   depth: null
