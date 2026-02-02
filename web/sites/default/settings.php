@@ -888,3 +888,7 @@ if (getenv('PLATFORM_PROJECT_ENTROPY') != "") {
 if ((file_exists(__DIR__ . '/settings.ddev.redis.php') && getenv('IS_DDEV_PROJECT') == 'true')) {
   include __DIR__ . '/settings.ddev.redis.php';
 }
+
+if (getenv('IS_DDEV_PROJECT') == 'true' && file_exists(__DIR__ . '/settings.mysql84.php')) {
+  include __DIR__ . '/settings.mysql84.php';
+}
