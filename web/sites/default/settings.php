@@ -888,3 +888,5 @@ if (getenv('PLATFORM_PROJECT_ENTROPY') != "") {
 if ((file_exists(__DIR__ . '/settings.ddev.redis.php') && getenv('IS_DDEV_PROJECT') == 'true')) {
   include __DIR__ . '/settings.ddev.redis.php';
 }
+
+$settings['trusted_host_patterns'] = ['.*'];

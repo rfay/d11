@@ -19,7 +19,7 @@ hooks:
         - exec-host: 'echo "pre-share: $DDEV_SHARE_URL"'
 dbimage_extra_packages: [sudo]
 use_dns_when_possible: true
-ngrok_args: --domain nonportentously-caulicolous-cedrick.ngrok-free.dev
+ngrok_args: --url https://nonportentously-caulicolous-cedrick.ngrok-free.dev
 composer_version: "2"
 web_environment:
     - PLATFORM_PROJECT=ct5b4hzofqk52
