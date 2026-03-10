@@ -45,6 +45,7 @@ Release managers
 - Dave Long 'longwave' https://www.drupal.org/u/longwave
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 - Victoria Spagnolo 'quietone' https://www.drupal.org/u/quietone
+- (provisional) Edward Wu 'godotislate' https://www.drupal.org/u/godotislate
 
 Core JavaScript packages
 - Théodore Biadala 'nod_' https://www.drupal.org/u/nod_
@@ -119,7 +120,6 @@ Cache
 - Kristiaan Van den Eynde 'kristiaanvandeneynde' https://www.drupal.org/u/kristiaanvandeneynde
 
 CKEditor 5
-- Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
 Claro
@@ -202,7 +202,6 @@ Dynamic Page Cache
 
 Editor
 - Henrik Danielsson 'TwoD' https://www.drupal.org/u/TwoD
-- Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Entity API
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
@@ -256,7 +255,6 @@ JavaScript
 JSON:API
 - Mateu Aguiló Bosch 'e0ipso' https://www.drupal.org/u/e0ipso
 - Björn Brala 'bbrala' https://www.drupal.org/u/bbrala
-- Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Language
 - Christian López Espínola 'penyaskito' https://www.drupal.org/u/penyaskito
@@ -277,7 +275,7 @@ Mail
 - ?
 
 Markup
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 
 Media
 - Sean Blommaert 'seanB' https://www.drupal.org/u/seanb
@@ -325,7 +323,7 @@ Olivero
 - Andy Blum 'andy-blum' https://www.drupal.org/u/andy-blum
 
 Options
-- ?
+- Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
 
 Page Cache
 - Lorenz Schori 'znerol' https://www.drupal.org/u/znerol
@@ -359,7 +357,7 @@ Request Processing
 - ?
 
 REST
-- Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
+- ?
 
 Responsive Image
 - Peter Droogmans 'attiks' https://www.drupal.org/u/attiks
@@ -374,7 +372,8 @@ Serialization
 - Brad Jones 'bradjones1' https://www.drupal.org/u/bradjones1
 
 Settings Tray
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
+- Chris Weber 'cosmicdreams' https://www.drupal.org/u/cosmicdreams
 
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran

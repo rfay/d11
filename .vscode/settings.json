@@ -2,7 +2,7 @@
    /* DDEV web container */
    
    /* PHP Intelephense */
-   "intelephense.environment.phpVersion": "8.3",
+   "intelephense.environment.phpVersion": "8.5",
    
    /* PHP Linting */
    "php.validate.executablePath": "/usr/bin/php",
