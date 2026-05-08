@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
@@ -57,7 +57,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
     // bundles.
     $this->drupalCreateContentType(['type' => 'article']);
     $this->drupalCreateContentType(['type' => 'page']);
-    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentItemInterface::OPEN, 'comment_article');
+    $this->addDefaultCommentField('node', 'article', 'comment_article', CommentingStatus::Open, 'comment_article');
     $this->addDefaultCommentField('node', 'page', 'comment_page');
 
     $admin_user = $this->drupalCreateUser([
@@ -139,6 +139,7 @@ class ContentTranslationSettingsTest extends BrowserTestBase {
     ];
     $this->assertSettings('comment', 'comment_article', TRUE, $edit);
     $entity_field_manager = \Drupal::service('entity_field.manager');
+    $entity_field_manager->clearCachedFieldDefinitions();
     $definition = $entity_field_manager->getFieldDefinitions('comment', 'comment_article')['comment_body'];
     $this->assertTrue($definition->isTranslatable(), 'Article comment body is translatable.');
     $definition = $entity_field_manager->getFieldDefinitions('comment', 'comment_article')['subject'];
