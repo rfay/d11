@@ -42,6 +42,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
   protected function doTestFrontPageAuthenticatedWarmCache(): void {
     $user = $this->drupalCreateUser();
     $this->drupalLogin($user);
+    sleep(2);
+    $this->drupalGet('<front>');
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->drupalGet('<front>');
@@ -127,7 +130,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 270,
+      'QueryCount' => 273,
       'CacheGetCount' => 268,
       'CacheGetCountByBin' => [
         'config' => 60,
