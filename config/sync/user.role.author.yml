@@ -1,4 +1,4 @@
-uuid: dbb78736-2495-408c-aeda-a845b4a30b1e
+uuid: 4bb5742c-cb5f-479e-8e7e-fa8432a60398
 langcode: en
 status: true
 dependencies:
@@ -17,13 +17,13 @@ dependencies:
     - contextual
     - file
     - layout_builder
+    - navigation
     - node
     - path
     - system
     - taxonomy
-    - toolbar
 _core:
-  default_config_hash: oxYBa-hJuHuBlVF60mUi0dvHmER-5xRgw277hsbfAW4
+  default_config_hash: aCCyadCrtpuMcmEArhpwJGlkeIxEed7bg5v86heYqms
 id: author
 label: Author
 weight: 3
@@ -32,7 +32,7 @@ permissions:
   - 'access content overview'
   - 'access contextual links'
   - 'access files overview'
-  - 'access toolbar'
+  - 'access navigation'
   - 'cancel account'
   - 'change own username'
   - 'configure editable article node layout overrides'

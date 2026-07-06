@@ -1,16 +1,16 @@
-uuid: f0172f73-68c1-4b01-a5bc-fd5fbdc8cb8a
+uuid: 401fc921-c36b-4b34-b826-5399704c7a93
 langcode: en
 status: true
 dependencies:
   config:
     - node.type.article
 _core:
-  default_config_hash: RDuP1jcZGVZtdt1bNaMJ-KSp72XRKpYXwIK4_kOq6K8
+  default_config_hash: ZzNNcBzZ7wplpA1FZNMB8eQ9AhdvIu57fEYuGI8HD8Q
 id: node.article.promote
 field_name: promote
 entity_type: node
 bundle: article
-label: 'Promoted to front page'
+label: Promoted
 description: ''
 required: false
 translatable: false

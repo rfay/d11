@@ -1,4 +1,4 @@
-uuid: edca1fc2-60bc-43ca-8173-626bbd7e5dd5
+uuid: 491ba601-5b1a-4e80-854e-1efdfabed581
 langcode: en
 status: true
 dependencies:
@@ -7,18 +7,14 @@ dependencies:
   module:
     - filter
     - media
-    - search
-    - shortcut
     - system
 _core:
-  default_config_hash: 5vcfU6ndu_aAXrWjsIjBqGOIyMfiiXYyYqjOWiALt6Y
+  default_config_hash: NIdXIuy50QW5gU-_FT12WB2kl-dperteQ4Q02YHgRG4
 id: authenticated
 label: 'Authenticated user'
 weight: 1
 is_admin: false
 permissions:
   - 'access content'
-  - 'access shortcuts'
-  - 'search content'
   - 'use text format basic_html'
   - 'view media'

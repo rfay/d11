@@ -1,5 +1,4 @@
 label: Usuarios
-description: 'Encuentre y gestione a las personas que interactúan con su sitio.'
 display:
   default:
     display_title: 'Por defecto'
@@ -19,14 +18,8 @@ display:
           label: Roles
         created:
           label: 'Miembro desde hace'
-          settings:
-            future_format: '@interval'
-            past_format: '@interval'
         access:
           label: 'Último acceso'
-          settings:
-            future_format: 'Desde hace @interval'
-            past_format: 'Hace @interval'
         operations:
           label: Operaciones
         mail:
@@ -41,7 +34,6 @@ display:
           expose:
             items_per_page_label: 'Elementos por página'
             items_per_page_options_all_label: '- Todo -'
-            offset_label: Desplazamiento
       exposed_form:
         options:
           submit_button: Filtro
@@ -53,9 +45,6 @@ display:
         area_text_custom:
           content: 'No people available.'
       filters:
-        combine:
-          expose:
-            label: 'Nombre o correo electrónico contiene'
         status:
           group_info:
             label: Estado
@@ -76,7 +65,6 @@ display:
     display_options:
       menu:
         title: Listado
-        description: 'Encuentre y gestione a las personas que interactúan con su sitio.'
       tab_options:
         title: Usuarios
         description: 'Gestionar cuentas, roles y permisos de usuarios.'

@@ -39,9 +39,6 @@ display:
           exposed_sorts_label: 'Ordenar por'
           sort_asc_label: Asc
           sort_desc_label: Desc
-      empty:
-        area_text_custom:
-          content: 'No hay contenido disponible.'
       filters:
         title:
           expose:
@@ -69,4 +66,3 @@ display:
         title: Contenido
       tab_options:
         title: Contenido
-        description: 'Encuentre y gestione el contenido'

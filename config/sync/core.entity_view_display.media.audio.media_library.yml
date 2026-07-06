@@ -1,4 +1,4 @@
-uuid: d301dbd6-7aab-43c3-b1d6-4716b3e7d853
+uuid: eea20e94-67a9-461e-a1db-1c4c06cf3b74
 langcode: en
 status: true
 dependencies:
@@ -10,7 +10,7 @@ dependencies:
   module:
     - image
 _core:
-  default_config_hash: v22l1MPmJrbStBx5vFub2CgCkb1I5tuDflfPxGo5BZE
+  default_config_hash: sBwNIa9qH-ycX5etedc3sDjX-_M-MkT1ZS3ywvZm3ng
 id: media.audio.media_library
 targetEntityType: media
 bundle: audio
@@ -20,8 +20,8 @@ content:
     type: image
     label: hidden
     settings:
-      image_style: thumbnail
       image_link: ''
+      image_style: thumbnail
       image_loading:
         attribute: lazy
     third_party_settings: {  }

@@ -1,5 +1,4 @@
 label: 'Contenido moderado'
-description: 'Encuentra y modera contenido.'
 display:
   default:
     display_title: 'Por defecto'
@@ -33,7 +32,6 @@ display:
           expose:
             items_per_page_label: 'Elementos por página'
             items_per_page_options_all_label: '- Todo -'
-            offset_label: Desplazamiento
       exposed_form:
         options:
           submit_button: Filtro
@@ -41,9 +39,6 @@ display:
           exposed_sorts_label: 'Ordenar por'
           sort_asc_label: Asc
           sort_desc_label: Desc
-      empty:
-        area_text_custom:
-          content: 'No hay contenido moderado disponible. Solo las versiones pendientes de contenido, como los borradores, se enumeran aquí.'
       filters:
         title:
           expose:

@@ -1,4 +1,4 @@
-uuid: 08f82bf6-bd11-416f-a235-07a3aeeff936
+uuid: 114f49f2-45be-4c52-88d0-e64e92258091
 langcode: en
 status: true
 dependencies:
@@ -18,14 +18,13 @@ dependencies:
     - contextual
     - file
     - layout_builder
+    - navigation
     - node
     - path
-    - shortcut
     - system
     - taxonomy
-    - toolbar
 _core:
-  default_config_hash: sPKcdyD0c7VBKh6ETK8IjejBnGev7qhKbv3fh--V8kc
+  default_config_hash: aIWtfRkilnjI5HJsVgdsNmGE-oSiwbzerjmqsC_oCSY
 id: editor
 label: Editor
 weight: 4
@@ -35,9 +34,8 @@ permissions:
   - 'access content overview'
   - 'access contextual links'
   - 'access files overview'
+  - 'access navigation'
   - 'access taxonomy overview'
-  - 'access toolbar'
-  - 'administer shortcuts'
   - 'cancel account'
   - 'change own username'
   - 'configure editable article node layout overrides'

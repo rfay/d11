@@ -1,5 +1,4 @@
 label: 'Página inicio'
-description: 'Todo el contenido promovido a la página principal.'
 display:
   default:
     display_title: 'Por defecto'
@@ -13,8 +12,6 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       empty:
-        area_text_custom:
-          content: 'Todavía no se ha creado contenido para la portada.'
         title:
           title: 'Bienvenido a [site:name]'
       header:

@@ -1,4 +1,4 @@
-uuid: 0ac8c71b-1efd-4c54-9c0e-3463bc29e9d3
+uuid: fd26d9f8-8e4f-4f95-bac6-c3b066be5aac
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
     - node
     - user
 _core:
-  default_config_hash: 75BE3MYblIjbBokUC5Z_GCbkKZpv0KCOrE24nKQdwmo
+  default_config_hash: 1CA3Iu1LIcanzqMGW_U8pLzH3jl508g83eL7Kyp7Sc0
 id: related_recipes
 label: 'Related recipes'
 module: views
@@ -157,7 +157,6 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: entity_target_id
-          target_entity_type_id: taxonomy_term
           default_action: default
           exception:
             value: all
@@ -188,6 +187,7 @@ display:
           validate_options: {  }
           break_phrase: true
           not: false
+          target_entity_type_id: taxonomy_term
       filters:
         status:
           id: status

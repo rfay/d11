@@ -1,4 +1,4 @@
-uuid: 9bf345f0-31d8-421a-853d-8e243a410667
+uuid: 70338d7f-7b1d-49a1-8b53-179056011093
 langcode: en
 status: true
 dependencies:
@@ -7,16 +7,14 @@ dependencies:
   module:
     - filter
     - media
-    - search
     - system
 _core:
-  default_config_hash: lE90Ct_rHejFOsn20-6LP705miuBdfzI_J2PV8esGos
+  default_config_hash: HbhKmtJcheAa1uHU_ihcvhtZXo6aR-3dVeCP0r9dvNQ
 id: anonymous
 label: 'Anonymous user'
 weight: 0
 is_admin: false
 permissions:
   - 'access content'
-  - 'search content'
   - 'use text format restricted_html'
   - 'view media'

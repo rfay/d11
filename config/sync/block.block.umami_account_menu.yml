@@ -1,4 +1,4 @@
-uuid: f43fdb64-62e8-49d7-8a7d-009042ae0dd5
+uuid: 98d821a9-78c4-473b-9000-8576dbf73b13
 langcode: en
 status: true
 dependencies:
@@ -9,7 +9,7 @@ dependencies:
   theme:
     - umami
 _core:
-  default_config_hash: iDZiXP2IUN3qEE__zNOAVdC9bO4zxZ3IB2OsPZ_dezM
+  default_config_hash: NhxakO3PsoxguDCLlxFU1oRMLG0JAxWAAD8ox0efSCo
 id: umami_account_menu
 theme: umami
 region: pre_header
@@ -24,4 +24,5 @@ settings:
   level: 1
   depth: 1
   expand_all_items: false
+  ignore_active_trail: true
 visibility: {  }
