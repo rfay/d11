@@ -52,7 +52,7 @@ jump-start:
   stage: validate
   needs: [composer]
   variables:
-    NEXT_MODULE_VERSION: 4.3.13
+    NEXT_MODULE_VERSION: 4.4.0
     SEARCH_API_SOLR_JUMP_START_CONFIG_SET: 1
   script:
     - cd $CI_PROJECT_DIR && pwd
