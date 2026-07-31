@@ -9,8 +9,8 @@ fail_on_hook_fail: true
 hooks:
     post-share:
         - exec-host: echo "post-share happened"
-    post-start:
-        - composer: install
+          #post-start:
+          #- composer: install
     pre-share:
         - exec-host: 'echo "pre-share: $DDEV_SHARE_URL"'
 dbimage_extra_packages: [sudo]
