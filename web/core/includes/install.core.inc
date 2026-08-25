@@ -172,6 +172,7 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
         $finish_url = $install_state['profile_info']['distribution']['install']['finish_url'];
       }
       install_goto($finish_url);
+      \Drupal::service('cache_prewarmer')->preWarmAllCaches();
     }
   }
 }
@@ -454,19 +455,6 @@ function install_begin_request($class_loader, &$install_state): void {
   $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system, $install_state['parameters']['profile'] ?? NULL));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
-
-  /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
-  $module_list = \Drupal::service('extension.list.module');
-  /** @var \Drupal\Core\Extension\ProfileExtensionList $profile_list */
-  $profile_list = \Drupal::service('extension.list.profile');
-
-  // Prime \Drupal\Core\Extension\ExtensionList::getPathname()'s static cache.
-  foreach ($install_state['profiles'] as $name => $profile) {
-    // Profile path is set in both module and profile lists. See
-    // \Drupal\Core\Config\ConfigInstaller::getProfileStorages for example.
-    $profile_list->setPathname($name, $profile->getPathname());
-    $module_list->setPathname($name, $profile->getPathname());
-  }
 
   $profile = _install_select_profile($install_state);
   if ($profile !== NULL) {
