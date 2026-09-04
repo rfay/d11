@@ -14700,12 +14700,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/tests/src/Unit/FieldUiTableTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$file_upload in empty\\(\\) always exists and is not falsy\\.$#',
-	'identifier' => 'empty.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/file.module',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\ComputedFileUrl\\:\\:setValue\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23124,40 +23118,40 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:assertCacheMaxAge\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:assertCacheMaxAge\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:assertCacheTags\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:assertCacheTags\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:assertNoCacheContext\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:assertNoCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:assertPageCacheContextsAndTags\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:assertPageCacheContextsAndTags\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\FrontPageTest\\:\\:enablePageCaching\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Views\\\\PromotedContentPageTest\\:\\:enablePageCaching\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/FrontPageTest.php',
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/Views/PromotedContentPageTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\FunctionalJavascript\\\\ContextualLinksTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
@@ -30183,6 +30177,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Kernel/Migrate/d6/MigrateUserTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\NotificationHandlerTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Kernel/NotificationHandlerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\NotificationHandlerTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Kernel/NotificationHandlerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Kernel\\\\UserMailNotifyTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
@@ -38853,12 +38859,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/FunctionalJavascript/WorkspacesLayoutBuilderIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Kernel\\\\WorkspaceIntegrationTest\\:\\:providerTestAllowedEntityCrudInNonDefaultWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\SwitchToLiveForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
