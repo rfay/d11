@@ -21,5 +21,6 @@
    "phpstan.enabled": true,
    "phpstan.showProgress": true,
    "phpstan.binPath": "/var/www/html/vendor/bin/phpstan",
-   "phpstan.configFile": "/var/www/html/phpstan.neon"
+   "phpstan.configFile": "/var/www/html/phpstan.neon",
+   "php.version": "8.5"
 }
