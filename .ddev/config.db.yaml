@@ -1,0 +1,6 @@
+#ddev-silent-no-warn
+#dbimage: randyfay/uncompressed-2g:v1.25.4
+#dbimage: randyfay/mysql-97-tagbase:v1.25.4-fixed
+#dbimage: randyfay/mysql-97-tagbase:v1.25.4
+#dbimage: randyfay/uncompressed-2g:v1.25.4
+
