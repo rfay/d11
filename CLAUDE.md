@@ -127,8 +127,11 @@ Only from inside this sandbox; nothing can connect in from outside.
   `d11.ddev.site` (502). Root's `CURL_CA_BUNDLE` doesn't include DDEV's mkcert
   root, so pass it with `--cacert`.
 - From inside the web container: `ddev exec curl -sS http://localhost/`.
-- Chromium/Playwright is preinstalled and can load the site for screenshots
-  (pass `--no-proxy-server` or bypass `*.ddev.site`).
+- Chromium/Playwright is preinstalled and can load the site for screenshots.
+  Launch it with `proxy: { server: process.env.HTTPS_PROXY, bypass: '*.ddev.site' }`
+  and `ignoreHTTPSErrors: true` on the page; `--no-proxy-server` isn't enough.
+- `ddev drush uli --uri=https://d11.ddev.site --no-browser` gives a one-time
+  admin login link for scripted browser sessions.
 
 ### Troubleshooting
 
