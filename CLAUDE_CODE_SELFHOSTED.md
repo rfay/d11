@@ -9,7 +9,9 @@ but they run on your workspace, as your user, with your network.
 > **Status: tested** on 2026-09-24 in a coder.ddev.com `freeform` workspace
 > (`claude-d11-selfhosted`) with Claude Code 2.1.281, DDEV v1.25.3 and git 2.43,
 > and again from scratch the same day on a staging-coder.ddev.com workspace
-> (`d11-coder-staging`) with DDEV v1.25.4.
+> (`d11-coder-staging`) with DDEV v1.25.4, and a third time on a coder.ddev.com
+> workspace (`claude-selfhosted-1`) with DDEV v1.25.4, where the site was
+> installed and checked with curl and Playwright from inside a session.
 > Values specific to that workspace are listed under
 > [This workspace's values](#this-workspaces-values); substitute your own.
 
@@ -26,7 +28,7 @@ The Anthropic-hosted sandbox works, but it's restrictive:
 | TLS-inspecting egress gateway; its CA has to be injected into DDEV's images | Normal outbound TLS; no CA injection |
 | Outbound traffic only on ports 80 and 443 | Whatever the host's network allows |
 | `ddev share` fails (cloudflared needs port 7844; ngrok is rejected by the gateway) | `ddev share` should work (not tested yet) |
-| Only curl and Playwright inside the container can see the site | You can open the site yourself at its Coder URL |
+| Only curl and Playwright inside the container can see the site | You can open the site yourself at its Coder URL (which may be public; see [Seeing the site](#working-with-ddev-in-a-runner-session)) |
 | Fresh container each session; DDEV database starts empty | Persistent workspace; the DDEV project and database survive between sessions |
 
 ## Requirements
@@ -310,16 +312,41 @@ Seeing the site:
 - **You:** `https://d11--<workspace>--<owner>.coder.ddev.com`, and Mailpit at
   `https://mailpit-d11--<workspace>--<owner>.coder.ddev.com`. On the staging
   server the domain is `staging-coder.ddev.com` instead; `ddev start` prints
-  the right URLs. Coder authenticates you, so only the workspace owner (and
-  people it's shared with) can open them.
-  - From the session, curl gets `303` to Coder's login
-    (`/api/v2/applications/auth-redirect`), not the site. To check the Coder
-    route from inside the workspace, go straight to the router:
+  the right URLs.
+  - **Check whether the site URL is public.** Whether Coder asks for a login
+    depends on the app's share level, and it isn't the same everywhere. On
+    `d11-coder-staging`, an unauthenticated curl got `303` to Coder's login
+    (`/api/v2/applications/auth-redirect`). On `claude-selfhosted-1`, the
+    `d11` app answered `200` with the Drupal home page to anyone, while
+    Mailpit and the `8080--main--...` port URL still answered `303`. Test it
+    with no cookies:
+    `curl -s -o /dev/null -w '%{http_code}\n' https://d11--<workspace>--<owner>.coder.ddev.com/`.
+    If it says `200`, the site is on the internet: don't keep
+    `--account-pass=admin`; set a strong password with
+    `ddev drush user:password admin '<password>'`.
+  - When the Coder URL does require a login, curl from the session can't get
+    past it. To check the Coder route from inside the workspace, go straight
+    to the router:
     `curl -H 'Host: d11--<workspace>--<owner>.coder.ddev.com' http://localhost:8080/`
     (Mailpit: the same on port 8025).
 - **The session:** curl and Playwright work as on any DDEV host, at
-  `https://d11.ddev.site`, with no proxy settings. The certificate verifies
-  once `mkcert -install` has run.
+  `https://d11.ddev.site`, with no proxy settings.
+  - curl verifies the certificate once `mkcert -install` has run (it uses the
+    system trust store).
+  - The workspace has no browser. Install one with
+    `npm i playwright && npx playwright install --with-deps chromium` (in a
+    scratch directory, not the checkout). `--with-deps` uses sudo for the
+    system libraries.
+  - Chromium doesn't use the system trust store; it uses the NSS database in
+    `~/.pki/nssdb`, and `mkcert -install` only adds its CA there if that
+    database already exists. Without it, Chromium fails with
+    `net::ERR_CERT_AUTHORITY_INVALID`. Create the database, then run
+    `mkcert -install` again:
+    `mkdir -p ~/.pki/nssdb && certutil -d sql:$HOME/.pki/nssdb -N --empty-password && mkcert -install`
+    (`certutil` is in `libnss3-tools`, which the Playwright install adds).
+    Or pass `ignoreHTTPSErrors: true` to `newPage()`.
+  - `ddev drush uli --uri=https://d11.ddev.site --no-browser` gives a one-time
+    login link for a scripted browser.
 - **Someone else:** `ddev share` (ngrok by default; needs `ngrok config
   add-authtoken`; not tested here). The shared URL is public, so change the
   `admin` password first or use
@@ -350,7 +377,15 @@ Seeing the site:
   answering `not found` means something other than DDEV holds the port. Fix
   the runner, then `ddev restart`.
 - **Browser warns about the certificate on `https://d11.ddev.site`:** run
-  `mkcert -install`, then `ddev restart`.
+  `mkcert -install`, then `ddev restart`. For Chromium or Playwright in the
+  workspace, create `~/.pki/nssdb` first (see
+  [Seeing the site](#working-with-ddev-in-a-runner-session)).
+- **Steps 3 and 5 were only partly done** (for example, the runner was started
+  by hand with `run.sh` and there's no `startup.sh`): after a workspace
+  restart there's no `/etc/gitconfig` and the mkcert CA isn't trusted. On
+  `claude-selfhosted-1` the first session found exactly that. Rerun
+  `sudo install -m 644 ~/.claude-runner/gitconfig /etc/gitconfig` and
+  `mkcert -install`, then set up `startup.sh` so it doesn't happen again.
 - **Site redirects to `/core/install.php`:** the database is empty; install
   Drupal as above.
 - **`Author identity unknown` on commit:** `/etc/gitconfig` is missing (the
@@ -395,16 +430,16 @@ Seeing the site:
 
 The workspaces used for testing:
 
-| Setting | Production | Staging |
-| --- | --- | --- |
-| Coder server | `https://coder.ddev.com` | `https://staging-coder.ddev.com` |
-| Coder workspace / owner | `claude-d11-selfhosted` / `rfay` | `d11-coder-staging` / `rfay` |
-| DDEV project names | `d11` | `d11-coder-staging,d11` |
-| Coder URL | `https://d11--claude-d11-selfhosted--rfay.coder.ddev.com` | `https://d11--d11-coder-staging--rfay.staging-coder.ddev.com` |
-| claude.ai environment | (not recorded) | `d11-coder-staging` |
-| Runner started by | `~/.bashrc` | `~/.coder-startup.sh` hook |
-| Checkout | `~/workspace/rfay/d11` | `~/workspace/rfay/d11` |
-| Environment key | `~/.claude-d11-selfhosted-secret.txt` (symlinked as `~/.claude-runner/environment-secret`) | `~/.claude-runner/environment-secret` |
+| Setting | Production | Staging | Production (2nd) |
+| --- | --- | --- | --- |
+| Coder server | `https://coder.ddev.com` | `https://staging-coder.ddev.com` | `https://coder.ddev.com` |
+| Coder workspace / owner | `claude-d11-selfhosted` / `rfay` | `d11-coder-staging` / `rfay` | `claude-selfhosted-1` / `rfay` |
+| DDEV project names | `d11` | `d11-coder-staging,d11` | `d11` |
+| Coder URL | `https://d11--claude-d11-selfhosted--rfay.coder.ddev.com` | `https://d11--d11-coder-staging--rfay.staging-coder.ddev.com` | `https://d11--claude-selfhosted-1--rfay.coder.ddev.com` (public: answers without a login) |
+| claude.ai environment | (not recorded) | `d11-coder-staging` | (not recorded) |
+| Runner started by | `~/.bashrc` | `~/.coder-startup.sh` hook | `run.sh` by hand in a terminal (no `startup.sh`) |
+| Checkout | `~/workspace/rfay/d11` | `~/workspace/rfay/d11` | `~/workspace/rfay/d11` |
+| Environment key | `~/.claude-d11-selfhosted-secret.txt` (symlinked as `~/.claude-runner/environment-secret`) | `~/.claude-runner/environment-secret` | `~/.claude-runner/environment-secret` |
 
 ## References
 
