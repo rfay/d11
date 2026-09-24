@@ -10,7 +10,7 @@ Run these in order from the project root:
 mkcert -install        # create/trust the local CA so https://d11.ddev.site is trusted
 ddev coder-setup       # Coder workspaces only: writes .ddev/config.coder.yaml + routing hook
 ddev start             # post-start hook runs `composer install`
-ddev drush si -y --existing-config --account-pass=admin   # only if the database is empty
+ddev drush si -y demo_umami --account-pass=admin          # only if the database is empty
 ```
 
 - Run `mkcert -install` before the first `ddev start`, so the router is issued
@@ -19,12 +19,17 @@ ddev drush si -y --existing-config --account-pass=admin   # only if the database
   `.ddev/config.coder.yaml` and `.ddev/docker-compose.coder-describe.yaml` (both
   are added to the global git ignore and must not be committed), and adds a
   post-start hook that publishes Traefik routes for the Coder URLs.
-- The site config lives in `config/sync`. The front page is `/admin/welcome`,
-  so anonymous visitors get a 403 on `/`. Log in with `ddev drush uli`.
+- The install profile is `demo_umami`, which has a `hook_install()`, so
+  `drush si --existing-config` fails. `config/sync` also doesn't import cleanly
+  onto a fresh Umami install: it deletes Umami's demo content and enables
+  `memcache`, which isn't in composer. The seed DB snapshot is no longer in git.
+- Log in with `ddev drush uli`.
 
 ## URLs
 
 - `https://d11.ddev.site` (see `ddev describe`)
-- Coder: `https://d11--<workspace>--<owner>.coder.ddev.com`. This is routed to
-  DDEV's `router_http_port` (8080 in the global config). If that port is busy,
-  DDEV falls back to another port (e.g. 33000) and the Coder URL returns 404.
+- Coder: `https://d11--<workspace>--<owner>.coder.ddev.com`. The Coder `d11` app
+  forwards to `localhost:8080`, which must be DDEV's `router_http_port`. If 8080
+  is busy, DDEV falls back to another port (e.g. 33000) and the Coder URL returns
+  "not found". The Claude self-hosted runner's `/healthz` listener defaults to
+  8080, so start the runner with `--health-port 0` (or another port).
