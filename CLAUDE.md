@@ -16,6 +16,9 @@ docroot `web`). The post-start hook runs `composer install`.
     commit `.ddev/config.coder.yaml` or
     `.ddev/docker-compose.coder-describe.yaml`; if `git status` shows them,
     `/etc/gitconfig` is missing (see Troubleshooting in that guide).
+  - `git status` can list untracked files left from the previous session's
+    branch (the runner reuses one checkout). Check whether they match a
+    branch (`git diff --no-index`) before committing or removing them.
 
 ## Claude Code cloud environment (custom setup)
 

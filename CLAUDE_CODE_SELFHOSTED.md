@@ -9,7 +9,10 @@ but they run on your workspace, as your user, with your network.
 > **Status: tested** on 2026-09-24 in a coder.ddev.com `freeform` workspace
 > (`claude-d11-selfhosted`) with Claude Code 2.1.281, DDEV v1.25.3 and git 2.43,
 > and again from scratch the same day on a staging-coder.ddev.com workspace
-> (`d11-coder-staging`) with DDEV v1.25.4.
+> (`d11-coder-staging`) with DDEV v1.25.4. A workspace restart on staging
+> was tested too: with no terminal open, the `~/.coder-startup.sh` hook
+> reinstalled `/etc/gitconfig` (sessions got the identity and ignores from it),
+> `ddev start d11` succeeded, and the Umami database was still there.
 > Values specific to that workspace are listed under
 > [This workspace's values](#this-workspaces-values); substitute your own.
 
@@ -164,9 +167,14 @@ What the flags do:
   - At capacity 1 the runner keeps one reusable checkout and **resets it to
     each session's branch**. So the DDEV project is always the same `d11`
     project, and its database carries over between sessions. But don't keep
-    workspace-only files in the checkout: they disappear when a session uses a
-    branch that doesn't have them. That's why the scripts here live in
+    workspace-only files in the checkout: a session on another branch may
+    remove or overwrite them. That's why the scripts here live in
     `~/.claude-runner/`.
+  - The reset doesn't always clean up the previous branch's files. After a
+    session on a branch that added `CLAUDE.md` and other docs, the next
+    session (on a branch without them) found them as untracked files in
+    `git status`. Compare them with the branch they came from before
+    committing or deleting them.
   - With a higher capacity, parallel checkouts would all be DDEV projects
     named `d11` and collide.
 - `--use-anthropic-git-proxy`: clone and push through Anthropic's git proxy,
@@ -250,10 +258,12 @@ printf '#!/usr/bin/env bash\nexec "$HOME/.claude-runner/startup.sh"\n' > ~/.code
 chmod +x ~/.coder-startup.sh
 ```
 
-This was tested on the staging workspace: after a restart with no terminal
-open, the runner registered and picked up a session. The hook's own output
-goes to `/tmp/coder-startup-user.log`; `startup.sh` still logs to
-`/tmp/claude-runner-startup.log`.
+The hook runs the script detached, with `~/.local/bin`, `~/.npm-global/bin`
+and `/home/linuxbrew/.linuxbrew/bin` on `PATH` (so `claude` is found). Its own
+output goes to `/tmp/coder-startup-user.log`; `startup.sh` still logs to
+`/tmp/claude-runner-startup.log`. Staging runs the hook from that PR. It was
+tested there: after a restart with no terminal open, the runner registered and
+picked up a session.
 
 Now start it: open a new terminal, or run `~/.claude-runner/startup.sh`. Watch
 the runner with `tmux attach -t claude-runner` (detach with Ctrl-b d).
@@ -327,10 +337,22 @@ Seeing the site:
 
 ## Operating the runner
 
-- **Restarting the runner** (to change flags): stop the loop in its tmux
-  session and start it again. On SIGTERM the runner waits for an in-flight
-  turn to finish before exiting. A session that was running continued after
-  the restart, but its working directory moved when `--base-dir` changed.
+- **Restarting the runner** (to change flags): stop the loop and start it
+  again. Editing `run.sh` alone isn't enough: the running loop keeps the flags
+  it started with. Pressing Ctrl-C in the `claude-runner` tmux pane didn't stop
+  the loop when tested on staging, for reasons not yet known. Restarting the
+  workspace did work: the startup script started a new loop. Killing the
+  tmux session and starting a new one should also work, but it hasn't been
+  tested:
+
+  ```bash
+  tmux kill-session -t claude-runner
+  tmux new-session -d -s claude-runner ~/.claude-runner/run.sh
+  ```
+
+  On SIGTERM the runner waits for an in-flight turn to finish before exiting.
+  A session that was running continued after a restart, but its working
+  directory moved when `--base-dir` changed.
 - **Changing `--base-dir`** moves the checkout, while DDEV still has `d11`
   registered at the old path. In the new checkout, run
   `ddev stop --unlist d11`, then `ddev coder-setup` and `ddev start`. Check
@@ -364,6 +386,8 @@ Seeing the site:
 - **`could not find requested project 'd11'` in
   `/tmp/claude-runner-startup.log`:** normal before the first session has
   cloned the repository and run `ddev start` in it.
+- **Ctrl-C in the runner's tmux pane doesn't stop it:** see
+  [Operating the runner](#operating-the-runner).
 - **Nothing is running after a workspace restart:** open a terminal (see the
   startup script above), or run `~/.claude-runner/startup.sh`. Its log is
   `/tmp/claude-runner-startup.log`. If it says there is no
