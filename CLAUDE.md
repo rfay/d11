@@ -5,6 +5,9 @@ docroot `web`). The post-start hook runs `composer install`.
 
 ## Claude Code cloud environment (custom setup)
 
+A standalone setup guide for people creating the environment, with curl and
+Playwright recipes and screenshots, is in `CLAUDE_CLOUD_SETUP.md`.
+
 Claude Code on the web sessions run in a container with a custom environment:
 
 - **Network access:** Full: any host, but only on ports 80 and 443 (see
