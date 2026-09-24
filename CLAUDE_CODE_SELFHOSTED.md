@@ -151,7 +151,9 @@ What the flags do:
 Workspace restarts stop every process, and the system trust store is on the
 ephemeral root filesystem. Save this as `~/.claude-runner/startup.sh` and
 `chmod +x` it. It trusts the mkcert CA, starts the runner loop in a tmux
-session, and starts DDEV. It does this at most once per workspace boot:
+session, and starts DDEV. It does this at most once per workspace boot. If
+`~/.claude-runner/environment-secret` doesn't exist, it does nothing and logs
+that the one-time setup is needed:
 
 ```bash
 #!/usr/bin/env bash
@@ -159,10 +161,18 @@ session, and starts DDEV. It does this at most once per workspace boot:
 # Safe to call repeatedly: it only does work once per workspace boot.
 set -u
 
+log=/tmp/claude-runner-startup.log
+# No environment key yet: the one-time setup (steps 2-4) hasn't been done.
+# Checked before the marker, so the next terminal retries once it has.
+if [ ! -f "$HOME/.claude-runner/environment-secret" ]; then
+  echo "$(date): no ~/.claude-runner/environment-secret; do the one-time setup first" >>"$log"
+  exit 0
+fi
+
 marker=/tmp/.claude-runner-startup-done   # /tmp is wiped on workspace restart
 [ -e "$marker" ] && exit 0
 touch "$marker"
-exec >>/tmp/claude-runner-startup.log 2>&1
+exec >>"$log" 2>&1
 echo "=== startup $(date)"
 
 # The CA in ~/.local/share/mkcert persists; the system trust store doesn't.
@@ -275,7 +285,8 @@ Seeing the site:
   and `user.email` (step 3).
 - **Nothing is running after a workspace restart:** open a terminal (see the
   startup script above), or run `~/.claude-runner/startup.sh`. Its log is
-  `/tmp/claude-runner-startup.log`.
+  `/tmp/claude-runner-startup.log`. If it says there is no
+  `environment-secret`, do steps 2–4 first.
 
 ## Caveats
 
