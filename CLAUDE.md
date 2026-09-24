@@ -11,6 +11,11 @@ docroot `web`). The post-start hook runs `composer install`.
   checkout is `~/workspace/rfay/d11`. None of the sandbox workarounds below
   apply: run `ddev` normally. See `CLAUDE_CODE_SELFHOSTED.md`, section
   "Working with DDEV in a runner session".
+  - Git identity and ignores come from `/etc/gitconfig`. Don't use
+    `git config --global`: it only reaches this session's own file. Don't
+    commit `.ddev/config.coder.yaml` or
+    `.ddev/docker-compose.coder-describe.yaml`; if `git status` shows them,
+    `/etc/gitconfig` is missing (see Troubleshooting in that guide).
 
 ## Claude Code cloud environment (custom setup)
 
