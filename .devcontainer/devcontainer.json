@@ -9,5 +9,5 @@
   "containerEnv": {
     "XDG_CONFIG_HOME": "/workspaces/.config"
   },
-  "postCreateCommand": "echo 'it should all be set up'"
+  "postCreateCommand": "mkcert -install"
 }
