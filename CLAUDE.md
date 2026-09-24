@@ -15,75 +15,169 @@ Claude Code on the web sessions run in a container with a custom environment:
 ### Setup script
 
 The environment's setup script (environment settings → Edit → Setup script)
-does the following:
+is below. It logs every step to `/tmp/setup-script.log`. If a required step
+fails, the script exits 1 with an `ERROR: required setup step failed: ...`
+line naming the step, so session startup reports the real problem. Optional
+steps (mkcert, global config, ngrok, image pre-pull) only print a warning.
 
 ```bash
-nohup dockerd >/tmp/dockerd.log 2>&1 &
-# Install DDEV from packages.ddev.com
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://packages.ddev.com/public/gpg.key -o /etc/apt/keyrings/ddev.asc
-printf "Types: deb\nURIs: https://packages.ddev.com/public/deb/ubuntu\nSuites: stable\nComponents: main\nSigned-By: /etc/apt/keyrings/ddev.asc\n" > /etc/apt/sources.list.d/ddev.sources
-apt-get update && apt-get install -y ddev
-
-# Let the ubuntu user reach the Docker socket
-usermod -aG docker ubuntu
-
-# ubuntu has to be able to write to the project (.ddev, vendor/, web/, ...)
-if [ -d /workspace/d11 ]; then
-  chown -R ubuntu:ubuntu /workspace/d11
-fi
-
-# The session still runs as root; this stops git from refusing
-# ("dubious ownership") once the repo belongs to ubuntu
-git config --system --add safe.directory /workspace/d11
-
-# Optional: set up DDEV's local CA and global config ahead of time
-sudo -u ubuntu -H mkcert -install || true
-sudo -u ubuntu -H ddev config global --instrumentation-opt-in=false || true
-
-# Wrap ddev so that running it as root re-runs it as ubuntu
-cat > /usr/local/bin/ddev <<'EOF'
 #!/bin/bash
-# Re-run as ubuntu when invoked as root, keeping the current directory
+# Claude Code cloud environment setup for the d11 DDEV project.
+#
+# Every step is logged to /tmp/setup-script.log. Required steps make the script
+# exit non-zero with a summary naming the failed step, so session startup
+# reports the real problem. Optional steps only print a warning.
+
+exec > >(tee -a /tmp/setup-script.log) 2>&1
+set -uo pipefail
+
+PROJECT=/workspace/d11
+REQUIRED_FAILED=()
+OPTIONAL_FAILED=()
+
+# run_step required|optional "name" function
+run_step() {
+  local kind=$1 name=$2 fn=$3 rc
+  echo "==> [$kind] $name"
+  "$fn"
+  rc=$?
+  if [ "$rc" -eq 0 ]; then
+    echo "<== ok: $name"
+  else
+    echo "!!! FAILED (exit $rc): $name"
+    if [ "$kind" = required ]; then
+      REQUIRED_FAILED+=("$name (exit $rc)")
+    else
+      OPTIONAL_FAILED+=("$name (exit $rc)")
+    fi
+  fi
+}
+
+# `sudo -n` never prompts for a password: it fails instead of hanging.
+as_ubuntu() { sudo -n -u ubuntu -H "$@"; }
+
+start_docker() {
+  nohup dockerd >/tmp/dockerd.log 2>&1 &
+  local i
+  for i in $(seq 60); do
+    docker info >/dev/null 2>&1 && return 0
+    sleep 1
+  done
+  echo "dockerd did not answer within 60s; see /tmp/dockerd.log"
+  return 1
+}
+
+install_ddev() {
+  install -m 0755 -d /etc/apt/keyrings &&
+  curl -fsSL https://packages.ddev.com/public/gpg.key -o /etc/apt/keyrings/ddev.asc &&
+  printf "Types: deb\nURIs: https://packages.ddev.com/public/deb/ubuntu\nSuites: stable\nComponents: main\nSigned-By: /etc/apt/keyrings/ddev.asc\n" \
+    > /etc/apt/sources.list.d/ddev.sources &&
+  apt-get update &&
+  DEBIAN_FRONTEND=noninteractive apt-get install -y ddev
+}
+
+setup_ubuntu_user() {
+  # Let ubuntu reach the Docker socket; stop git's "dubious ownership" refusal
+  usermod -aG docker ubuntu &&
+  git config --system --add safe.directory "$PROJECT" &&
+  if [ -d "$PROJECT" ]; then chown -R ubuntu:ubuntu "$PROJECT"; fi
+}
+
+install_ddev_wrapper() {
+  # Running ddev as root re-runs it as ubuntu in the current directory
+  cat > /usr/local/bin/ddev <<'EOF'
+#!/bin/bash
 if [ "$(id -u)" = 0 ]; then
-  exec sudo -u ubuntu -H --preserve-env=PATH bash -c 'cd "$1" && shift && exec /usr/bin/ddev "$@"' _ "$PWD" "$@"
+  exec sudo -n -u ubuntu -H --preserve-env=PATH bash -c 'cd "$1" && shift && exec /usr/bin/ddev "$@"' _ "$PWD" "$@"
 fi
 exec /usr/bin/ddev "$@"
 EOF
-chmod +x /usr/local/bin/ddev
+  chmod +x /usr/local/bin/ddev
+}
 
-# Make DDEV's containers trust the sandbox's TLS-inspecting egress CAs
-# (see "Network and TLS" below)
-for d in web-build db-build; do
-  mkdir -p /home/ubuntu/.ddev/$d
-  python3 - "$d" <<'PY'
-import re, subprocess, sys
-pems = re.findall(r'-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----',
-                  open('/root/.ccr/ca-bundle.crt').read(), re.S)
-keep = [p for p in pems if 'Anthropic' in subprocess.run(
-    ['openssl', 'x509', '-noout', '-subject'], input=p,
-    capture_output=True, text=True).stdout]
-open(f'/home/ubuntu/.ddev/{sys.argv[1]}/ccr-ca.crt', 'w').write('\n'.join(keep) + '\n')
-PY
-  printf 'COPY ccr-ca.crt /usr/local/share/ca-certificates/ccr-ca.crt\nRUN update-ca-certificates\n' \
-    > /home/ubuntu/.ddev/$d/pre.Dockerfile.ccr-ca
-  chown -R ubuntu:ubuntu /home/ubuntu/.ddev/$d
-done
+install_container_ca() {
+  # Make DDEV's containers trust the sandbox's TLS-inspecting egress CAs.
+  # Use the copies baked into the image: /root/.ccr/ca-bundle.crt is only
+  # written after this script has finished, so it can't be read here.
+  local certs=(/usr/local/share/ca-certificates/egress-gateway-ca-*.crt
+               /usr/local/share/ca-certificates/swp-ca-*.crt)
+  local c d
+  for c in "${certs[@]}"; do
+    [ -s "$c" ] || { echo "missing egress CA file: $c"; return 1; }
+  done
+  for d in web-build db-build; do
+    mkdir -p /home/ubuntu/.ddev/$d &&
+    cat "${certs[@]}" > /home/ubuntu/.ddev/$d/ccr-ca.crt &&
+    printf 'COPY ccr-ca.crt /usr/local/share/ca-certificates/ccr-ca.crt\nRUN update-ca-certificates\n' \
+      > /home/ubuntu/.ddev/$d/pre.Dockerfile.ccr-ca || return 1
+  done
+  chown -R ubuntu:ubuntu /home/ubuntu/.ddev
+}
 
-# ngrok for `ddev share` (cloudflared can't work here; see "Sharing the site").
-# NGROK_AUTHTOKEN is an environment variable in the environment settings. The
-# ddev wrapper passes only PATH through to ubuntu, so store the token in
-# ubuntu's ngrok config.
-curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar -xz -C /usr/local/bin
-if [ -n "${NGROK_AUTHTOKEN:-}" ]; then
-  sudo -u ubuntu -H ngrok config add-authtoken "$NGROK_AUTHTOKEN"
+setup_mkcert() {
+  # Create DDEV's local CA. TRUST_STORES=nss skips the system trust store,
+  # which needs sudo as ubuntu (a password) and made plain `mkcert -install` fail.
+  as_ubuntu env TRUST_STORES=nss mkcert -install
+}
+
+ddev_global_config() {
+  as_ubuntu /usr/bin/ddev config global --instrumentation-opt-in=false
+}
+
+install_ngrok() {
+  # ngrok for `ddev share` (cloudflared can't work here). NGROK_AUTHTOKEN is
+  # set in the environment settings; store it in ubuntu's ngrok config because
+  # the ddev wrapper passes only PATH through to ubuntu.
+  local tgz=/tmp/ngrok.tgz
+  curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o "$tgz" &&
+  tar -xzf "$tgz" -C /usr/local/bin &&
+  rm -f "$tgz" || return 1
+  if [ -n "${NGROK_AUTHTOKEN:-}" ]; then
+    as_ubuntu ngrok config add-authtoken "$NGROK_AUTHTOKEN"
+  else
+    echo "NGROK_AUTHTOKEN not set; ddev share won't work until it is"
+  fi
+}
+
+download_images() {
+  # Pull DDEV's images ahead of time so the first `ddev start` is faster
+  [ -d "$PROJECT" ] || return 0
+  (cd "$PROJECT" && timeout 600 /usr/local/bin/ddev utility download-images)
+}
+
+run_step required "start dockerd"          start_docker
+run_step required "install ddev"           install_ddev
+run_step required "set up ubuntu user"     setup_ubuntu_user
+run_step required "install ddev wrapper"   install_ddev_wrapper
+run_step required "install egress CA for DDEV containers" install_container_ca
+run_step optional "mkcert local CA"        setup_mkcert
+run_step optional "ddev global config"     ddev_global_config
+run_step optional "install ngrok"          install_ngrok
+run_step optional "pre-pull DDEV images"   download_images
+
+echo
+if [ ${#OPTIONAL_FAILED[@]} -gt 0 ]; then
+  printf 'WARNING: optional setup step failed: %s\n' "${OPTIONAL_FAILED[@]}" >&2
 fi
-
-# Optional: pull DDEV's images ahead of time so the first `ddev start` is faster
-if [ -d /workspace/d11 ]; then
-  (cd /workspace/d11 && ddev utility download-images) || true
+if [ ${#REQUIRED_FAILED[@]} -gt 0 ]; then
+  printf 'ERROR: required setup step failed: %s\n' "${REQUIRED_FAILED[@]}" >&2
+  echo "Full log: /tmp/setup-script.log" >&2
+  exit 1
 fi
+echo "Setup complete. Log: /tmp/setup-script.log"
 ```
+
+Things the setup script can't rely on:
+
+- `/root/.ccr/ca-bundle.crt` doesn't exist yet: the environment writes it
+  (and the agent-proxy CAs) only after the setup script finishes. The script
+  uses the egress CAs baked into the image under
+  `/usr/local/share/ca-certificates/` instead.
+- ubuntu has no passwordless sudo, so plain `mkcert -install` as ubuntu fails
+  while adding its CA to the system trust store. `TRUST_STORES=nss` skips that
+  store. Every `sudo` uses `-n` so it fails instead of waiting for a password.
+- `dockerd` isn't ready the moment it's started, so the script waits for
+  `docker info` to answer.
 
 The wrapper uses `sudo -u ubuntu -H`, not `sudo -iu ubuntu`: with `-i`, sudo
 re-quotes the command for a login shell, the directory argument is lost, and
@@ -97,9 +191,11 @@ DDEV runs in `/home/ubuntu` ("could not find a project").
   gateway, which re-signs TLS with `O=Anthropic, CN=sandbox-egress-gateway-*
   Egress Gateway CA`. So no Docker/DDEV proxy settings are needed; only the
   CA has to be trusted.
-- `/root/.ccr/agent-proxy-ca.crt` contains only the agent-proxy CAs, not the
-  egress gateway CA, so the setup script takes every `O=Anthropic` cert from
-  `ca-bundle.crt` instead.
+- The containers need the egress gateway and TLS inspection CAs
+  (`/usr/local/share/ca-certificates/egress-gateway-ca-*.crt` and
+  `swp-ca-*.crt`, part of the image). `/root/.ccr/agent-proxy-ca.crt` holds
+  only the agent-proxy CAs, and all of `/root/.ccr/` is written after the setup
+  script has run.
 - "Full" network access means any host, but only on ports 80 and 443.
   Everything else times out: tested 7844 (two Cloudflare edge IPs and
   portquiz.net), 8080, and 22 (github.com). So SSH-based git remotes and
@@ -174,6 +270,8 @@ the only way for someone outside to see the site.
 - Files under the repo are owned by root: the checkout didn't exist yet when the
   setup script ran, so it wasn't chowned. Run
   `chown -R ubuntu:ubuntu /workspace/d11` (it needs root and approval).
+- Something from the setup script is missing (wrapper, `~/.ddev/*-build`,
+  ngrok): see `/tmp/setup-script.log` for the step that failed.
 - Docker not responding: see `/tmp/dockerd.log`.
 - `SSL certificate problem: self-signed certificate in certificate chain`
   inside a container, or a web image build that sits in `composer self-update`
