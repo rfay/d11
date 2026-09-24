@@ -230,6 +230,15 @@ DDEV runs in `/home/ubuntu` ("could not find a project").
   `docker buildx history ls` / `docker buildx history logs <id>` show which
   image build step is slow.
 
+### Installing Drupal
+
+After `ddev start`, the site redirects to `/core/install.php` until Drupal is
+installed. Install the Umami demo with:
+
+```bash
+ddev drush si -y demo_umami --account-pass=admin
+```
+
 ### Reaching the site
 
 Only from inside this sandbox; nothing can connect in from outside.
