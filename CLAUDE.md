@@ -7,7 +7,8 @@ docroot `web`). The post-start hook runs `composer install`.
 
 Claude Code on the web sessions run in a container with a custom environment:
 
-- **Network access:** full.
+- **Network access:** Full: any host, but only on ports 80 and 443 (see
+  "Network and TLS").
 - **Session user:** root. DDEV refuses to run as root, so DDEV runs as the
   `ubuntu` user (uid 1000) instead.
 
@@ -69,6 +70,15 @@ PY
   chown -R ubuntu:ubuntu /home/ubuntu/.ddev/$d
 done
 
+# ngrok for `ddev share` (cloudflared can't work here; see "Sharing the site").
+# NGROK_AUTHTOKEN is an environment variable in the environment settings. The
+# ddev wrapper passes only PATH through to ubuntu, so store the token in
+# ubuntu's ngrok config.
+curl -fsSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar -xz -C /usr/local/bin
+if [ -n "${NGROK_AUTHTOKEN:-}" ]; then
+  sudo -u ubuntu -H ngrok config add-authtoken "$NGROK_AUTHTOKEN"
+fi
+
 # Optional: pull DDEV's images ahead of time so the first `ddev start` is faster
 if [ -d /workspace/d11 ]; then
   (cd /workspace/d11 && ddev utility download-images) || true
@@ -90,6 +100,10 @@ DDEV runs in `/home/ubuntu` ("could not find a project").
 - `/root/.ccr/agent-proxy-ca.crt` contains only the agent-proxy CAs, not the
   egress gateway CA, so the setup script takes every `O=Anthropic` cert from
   `ca-bundle.crt` instead.
+- "Full" network access means any host, but only on ports 80 and 443.
+  Everything else times out: tested 7844 (two Cloudflare edge IPs and
+  portquiz.net), 8080, and 22 (github.com). So SSH-based git remotes and
+  anything else on a non-web port won't work from the session or the containers.
 - The CA goes in global `~/.ddev/{web,db}-build/pre.Dockerfile.ccr-ca` (see
   the [DDEV networking docs](https://docs.ddev.com/en/stable/users/usage/networking/)),
   so nothing sandbox-specific is committed to the project.
@@ -132,6 +146,24 @@ Only from inside this sandbox; nothing can connect in from outside.
   and `ignoreHTTPSErrors: true` on the page; `--no-proxy-server` isn't enough.
 - `ddev drush uli --uri=https://d11.ddev.site --no-browser` gives a one-time
   admin login link for scripted browser sessions.
+
+### Sharing the site
+
+Nothing can connect in to the sandbox, so `ddev share` (an outbound tunnel) is
+the only way for someone outside to see the site.
+
+- `ddev share --provider=cloudflared` doesn't work here. It gets a
+  `*.trycloudflare.com` URL (an ordinary 443 request), but the tunnel has to
+  connect to Cloudflare's edge on port 7844, which is blocked:
+  `dial tcp 198.41.200.13:7844: i/o timeout`, and the URL answers 530.
+- ngrok (the default provider) connects to `connect.ngrok-agent.com:443`,
+  which is reachable. It needs `NGROK_AUTHTOKEN` set in the environment
+  settings and the setup-script lines above. Then run `ddev share` in the
+  background and read the URL from its output.
+- Both providers point the tunnel at the web container's direct host port
+  (`DDEV_LOCAL_URL`, e.g. `http://127.0.0.1:32781`), not at the router.
+- A shared site is public. The Umami demo install uses `--account-pass=admin`,
+  so change the password or use `ddev share --provider-args "--basic-auth user:pass"`.
 
 ### Troubleshooting
 
