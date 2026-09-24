@@ -107,7 +107,9 @@ install_container_ca() {
   done
   for d in web-build db-build; do
     mkdir -p /home/ubuntu/.ddev/$d &&
-    cat "${certs[@]}" > /home/ubuntu/.ddev/$d/ccr-ca.crt &&
+    # awk 1, not cat: swp-ca-production.crt has no trailing newline, and cat
+    # glues two certs together, which breaks the container's whole CA bundle.
+    awk 1 "${certs[@]}" > /home/ubuntu/.ddev/$d/ccr-ca.crt &&
     printf 'COPY ccr-ca.crt /usr/local/share/ca-certificates/ccr-ca.crt\nRUN update-ca-certificates\n' \
       > /home/ubuntu/.ddev/$d/pre.Dockerfile.ccr-ca || return 1
   done
@@ -252,10 +254,18 @@ the only way for someone outside to see the site.
   `*.trycloudflare.com` URL (an ordinary 443 request), but the tunnel has to
   connect to Cloudflare's edge on port 7844, which is blocked:
   `dial tcp 198.41.200.13:7844: i/o timeout`, and the URL answers 530.
-- ngrok (the default provider) connects to `connect.ngrok-agent.com:443`,
-  which is reachable. It needs `NGROK_AUTHTOKEN` set in the environment
-  settings and the setup-script lines above. Then run `ddev share` in the
-  background and read the URL from its output.
+- ngrok (the default provider) doesn't work here either (tested ngrok 3.39.11).
+  It connects to `connect.ngrok-agent.com:443` directly through the egress
+  gateway, which re-signs TLS, so ngrok's pinned CA fails first:
+  `x509: certificate signed by unknown authority`. With
+  `connect_cas: host` under `agent:` in `~/.config/ngrok/ngrok.yml`, TLS
+  verifies, but the gateway then drops the tunnel protocol:
+  `failed to send authentication request: session closed`. The sandbox's
+  `/root/.ccr/README.md` lists ngrok among the clients the proxy doesn't
+  support ("report, do not work around").
+- `NGROK_AUTHTOKEN` from the environment settings is visible in the session
+  but was not set while the setup script ran, so the script's
+  `ngrok config add-authtoken` step was skipped.
 - Both providers point the tunnel at the web container's direct host port
   (`DDEV_LOCAL_URL`, e.g. `http://127.0.0.1:32781`), not at the router.
 - A shared site is public. The Umami demo install uses `--account-pass=admin`,
@@ -277,5 +287,10 @@ the only way for someone outside to see the site.
   inside a container, or a web image build that sits in `composer self-update`
   for minutes: the egress CA isn't installed. Check
   `~/.ddev/web-build/pre.Dockerfile.ccr-ca` exists, then `ddev utility rebuild`.
+- `curl error 77 ... error setting certificate file: /etc/ssl/certs/ca-certificates.crt`
+  in the container (post-start `composer install` exits 100): `ccr-ca.crt`
+  has two certs on one line (`-----END CERTIFICATE----------BEGIN
+  CERTIFICATE-----`). Rebuild it with `awk 1` as in the setup script, then
+  `ddev restart`.
 - Git as root will complain about "dubious ownership" unless
   `safe.directory` is set (the setup script sets it system-wide).
