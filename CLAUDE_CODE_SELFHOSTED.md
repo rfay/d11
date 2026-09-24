@@ -222,15 +222,24 @@ if ! pgrep -f '^claude self-hosted-runner' >/dev/null; then
   tmux new-session -d -s claude-runner "$HOME/.claude-runner/run.sh"
 fi
 
+# Coder routing hook (step 6). Without it, the Coder URL doesn't route and
+# `ddev launch` says "no coder-routes file found". Its files are untracked,
+# so a checkout reset or a new clone can lose them; recreate them if needed.
+checkout="$HOME/workspace/rfay/d11"
+if [ -d "$checkout/.ddev" ] && [ ! -f "$checkout/.ddev/config.coder.yaml" ]; then
+  (cd "$checkout" && ddev coder-setup)
+fi
+
 # Fails with "could not find requested project 'd11'" until the first
 # session has cloned the repository and run `ddev start` there (step 6).
 ddev start d11 -y || { sleep 5; ddev start d11 -y; }
 ```
 
 The first time it runs, before any session has cloned the repository,
-`ddev start d11` fails with `could not find requested project 'd11'`
-(twice, because of the retry). That's expected; the rest of the script has
-already run. After step 6 it starts the project normally.
+it skips `ddev coder-setup`, and `ddev start d11` fails with
+`could not find requested project 'd11'` (twice, because of the retry).
+That's expected; the rest of the script has already run. After step 6 it
+starts the project normally.
 
 Run it from `~/.bashrc` so it starts when you open a terminal:
 
@@ -274,9 +283,11 @@ terminal):
 
 ```bash
 cd ~/workspace/rfay/d11
-ddev coder-setup    # before the first ddev start
+ddev coder-setup    # before the first ddev start; startup.sh also does this
 ddev start
 ddev drush si -y demo_umami --account-pass=admin   # first time only; the database persists
+ddev describe       # the web row shows the Coder URL
+ddev launch         # prints the Coder URLs
 ```
 
 `ddev coder-setup` writes `.ddev/config.coder.yaml` and
@@ -289,9 +300,33 @@ Coder URLs. `ddev start` then prints lines like:
   + d11: http-8080 → d11-web-80  (https://d11--d11-coder-staging--rfay.staging-coder.ddev.com)
   + mailpit-d11: http-8025 → d11-web-8025  (https://mailpit-d11--d11-coder-staging--rfay.staging-coder.ddev.com)
 ```
- If
-it says `http-33000` (or anything other than 8080), something else holds port
+
+If it says `http-33000` (or anything other than 8080), something else holds port
 8080. See [Troubleshooting](#troubleshooting).
+
+To find the site URL after a start, use `ddev describe` or `ddev launch`.
+Both show the Coder URL, `https://d11--<workspace>--<owner>.coder.ddev.com`
+(on `claude-selfhosted-2`:
+`https://d11--claude-selfhosted-2--rfay.coder.ddev.com`).
+
+- **`ddev describe`** puts the Coder URL in the `web` row, labeled
+  `Use: ddev launch`, with the Mailpit URL under it. The same table also
+  lists `https://d11.ddev.site` and `127.0.0.1` URLs. Those only work inside
+  the workspace, not from your browser.
+- **`ddev launch`** can't open a browser in a workspace. coder.ddev.com
+  replaces it with a host command (`~/.ddev/commands/host/launch`) that
+  prints the Coder URLs instead:
+
+  ```text
+  Coder URLs for project 'd11':
+    Web:     https://d11--claude-selfhosted-2--rfay.coder.ddev.com
+    xhgui-d11: https://xhgui-d11--claude-selfhosted-2--rfay.coder.ddev.com
+    mailpit-d11: https://mailpit-d11--claude-selfhosted-2--rfay.coder.ddev.com
+  ```
+
+  `ddev launch /admin` adds a path, and `ddev launch -m` prints only the
+  Mailpit URL. If `ddev coder-setup` hasn't been run, it prints only
+  `(no coder-routes file found; run 'ddev coder-setup' then 'ddev start')`.
 
 You can also send follow-ups from any machine where you're signed in:
 `claude -p "your message" --cloud <session-id>`.
