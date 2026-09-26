@@ -15,6 +15,10 @@ So the practical ways to look at the site are:
 
 ![Umami demo home page, screenshotted by Playwright inside the cloud container](docs/images/umami-home.jpg)
 
+> For a project-agnostic version of this guide (same setup script, worked
+> through DDEV's own trivial Drupal 11 quickstart instead of this repo), see
+> [rfay/claude_code_cloud](https://github.com/rfay/claude_code_cloud).
+
 ## 1. Create the environment
 
 In Claude Code on the web, create (or edit) an environment for this repository:

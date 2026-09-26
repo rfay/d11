@@ -18,6 +18,10 @@ but they run on your workspace, as your user, with your network.
 For the Anthropic-hosted sandbox this repository also uses, and its limits,
 see [`CLAUDE_CLOUD_SETUP.md`](CLAUDE_CLOUD_SETUP.md).
 
+> For a project-agnostic version of this guide (same runner setup, worked
+> through DDEV's own trivial Drupal 11 quickstart instead of this repo), see
+> [rfay/claude_code_cloud](https://github.com/rfay/claude_code_cloud).
+
 ## Why self-host
 
 The Anthropic-hosted sandbox works, but it's restrictive:
@@ -289,9 +293,9 @@ Coder URLs. `ddev start` then prints lines like:
   + d11: http-8080 → d11-web-80  (https://d11--d11-coder-staging--rfay.staging-coder.ddev.com)
   + mailpit-d11: http-8025 → d11-web-8025  (https://mailpit-d11--d11-coder-staging--rfay.staging-coder.ddev.com)
 ```
- If
-it says `http-33000` (or anything other than 8080), something else holds port
-8080. See [Troubleshooting](#troubleshooting).
+
+If it says `http-33000` (or anything other than 8080), something else holds
+port 8080. See [Troubleshooting](#troubleshooting).
 
 You can also send follow-ups from any machine where you're signed in:
 `claude -p "your message" --cloud <session-id>`.
