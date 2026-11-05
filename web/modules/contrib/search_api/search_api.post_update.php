@@ -116,3 +116,11 @@ function search_api_post_update_views_cache_none(): ?TranslatableMarkup {
 
   return NULL;
 }
+
+/**
+ * Clear Views results cached before they varied by item access.
+ */
+function search_api_post_update_views_results_cache_access(): void {
+  // Results cached by earlier versions were shared between users regardless
+  // of item access. Running this update clears all caches, removing them.
+}

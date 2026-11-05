@@ -440,6 +440,14 @@ class ViewsCacheInvalidationTest extends KernelTestBase {
    *   The key of the user to set as currently active user.
    */
   protected function setCurrentUser($user_key) {
+    // Pretend the user switch happens on a new page request. Otherwise, the
+    // permissions hash calculated for the user earlier in the test would still
+    // be used after the user's roles have changed.
+    foreach (['cache.memory', 'cache.static'] as $bin) {
+      if ($this->container->has($bin)) {
+        $this->container->get($bin)->deleteAll();
+      }
+    }
     $this->currentUser->setAccount($this->users[$user_key]);
   }
 

@@ -5,6 +5,8 @@ namespace Drupal\search_api\Plugin\views\query;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Database\Query\ConditionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -658,6 +660,14 @@ class SearchApiQuery extends QueryPluginBase {
       // Trigger pager postExecute().
       $view->pager->postExecute($view->result);
       $view->pager->updatePageInfo();
+
+      // Apply the cacheability of the search query to the rendered view. It is
+      // only known once the search has run (for example, the cache contexts of
+      // the item access checks), so it is not part of the cacheability that
+      // Views calculates when the view is saved.
+      CacheableMetadata::createFromRenderArray($view->element)
+        ->addCacheableDependency($this->query)
+        ->applyTo($view->element);
     }
     catch (\Exception $e) {
       $this->abort($e->getMessage());
@@ -716,11 +726,25 @@ class SearchApiQuery extends QueryPluginBase {
     // First, unless disabled, check access for all entities in the results.
     if (!$this->options['skip_access']) {
       $account = $this->getAccessAccount();
+      $search_api_query = $result_set->getQuery();
+      // Cache contexts such as "user" would describe the current user rather
+      // than the account being checked, so do not cache the results then.
+      if ($account && $search_api_query instanceof RefinableCacheableDependencyInterface) {
+        $search_api_query->mergeCacheMaxAge(0);
+      }
       // If search items are not loaded already, pre-load them now in bulk to
       // avoid them being individually loaded inside checkAccess().
       $result_set->preLoadResultItems();
       foreach ($results as $item_id => $result) {
-        if (!$result->getAccessResult($account)->isAllowed()) {
+        $access_result = $result->getAccessResult($account);
+        // Whatever the access check depended on (for example permissions, the
+        // user or node grants) decides which users may share these results,
+        // so add it to the cacheability of the query. Denied items count too,
+        // as they might be allowed for another user.
+        if ($search_api_query instanceof RefinableCacheableDependencyInterface) {
+          $search_api_query->addCacheableDependency($access_result);
+        }
+        if (!$access_result->isAllowed()) {
           unset($results[$item_id]);
         }
       }
@@ -796,13 +820,14 @@ class SearchApiQuery extends QueryPluginBase {
    * Gets all the involved entities of the view.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
+   *   The entities.
    */
   protected function getAllEntities(): array {
     $entities = [];
 
     /** @var \Drupal\search_api\Plugin\views\ResultRow $row */
     foreach ($this->view->result as $row) {
-      $entity_adapter = $row->_object ?? NULL;
+      $entity_adapter = $row->_object;
       if ($entity_adapter instanceof EntityAdapter) {
         $entities[] = $entity_adapter->getEntity();
       }
