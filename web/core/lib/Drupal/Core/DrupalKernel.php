@@ -712,25 +712,29 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function terminate(Request $request, Response $response): void {
     if ($this->booted && $this->getHttpKernel() instanceof TerminableInterface) {
-      // Only run terminate() when essential services have been set up properly
-      // by preHandle() before.
-      if ($this->prepared === TRUE) {
-        $this->getHttpKernel()->terminate($request, $response);
-      }
-      // For destructable services, always call the destruct method if they were
-      // initialized during the request. Destruction is not necessary if the
-      // service was not used.
-      foreach ($this->container->getParameter('kernel.destructable_services') as $id) {
-        if ($this->container->initialized($id)) {
-          $service = $this->container->get($id);
-          $service->destruct();
+      try {
+        // Only run terminate() when essential services have been set up
+        // properly by preHandle() before.
+        if ($this->prepared === TRUE) {
+          $this->getHttpKernel()->terminate($request, $response);
+        }
+        // For destructable services, always call the destruct method if they
+        // were initialized during the request. Destruction is not necessary if
+        // the service was not used.
+        foreach ($this->container->getParameter('kernel.destructable_services') as $id) {
+          if ($this->container->initialized($id)) {
+            $service = $this->container->get($id);
+            $service->destruct();
+          }
         }
       }
-
-      // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
-      // request stack at the end of the execution cycle.
-      if ($this->prepared === TRUE) {
-        $this->container->get('request_stack')->pop();
+      finally {
+        // Release the request even if termination fails. Subsequent requests
+        // may bypass preHandle(), for example when served from the page cache.
+        if ($this->prepared === TRUE) {
+          $this->prepared = FALSE;
+          $this->container->get('request_stack')->pop();
+        }
       }
     }
   }
@@ -1025,15 +1029,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-
+    $container_definition = $this->getContainerFromCacheIfCacheable();
     // If there is no cached container definition, build a new container from
     // scratch.
-    if (!isset($container_definition)) {
+    if ($container_definition === NULL) {
       $container = $this->compileContainer();
 
       // Only dump the container if dumping is allowed. This is useful for
@@ -1979,6 +1978,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getExtensions(): array|false {
     return $this->getConfigStorage()->read('core.extension');
+  }
+
+  /**
+   * Gets the cached container definition if the cache may be used.
+   *
+   * @return array|null
+   *   The cached container definition, or NULL if the cache must not be used
+   *   or holds no definition.
+   */
+  protected function getContainerFromCacheIfCacheable(): ?array {
+    // If the module list hasn't already been set in updateModules and we are
+    // not forcing a rebuild, then try and load the container from the cache.
+    if (!$this->moduleList && !$this->containerNeedsRebuild) {
+      return $this->getCachedContainerDefinition();
+    }
+    return NULL;
   }
 
 }

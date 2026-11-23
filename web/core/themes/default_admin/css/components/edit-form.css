@@ -200,7 +200,6 @@
 }
 
 /* Sidebar accordion items — broken out to limit nesting depth. */
-
 .edit-form .page-wrapper__node-edit-form .layout-region--secondary .entity-meta > .accordion__item {
   margin: 0;
   border: 0 none;
@@ -222,8 +221,8 @@
     }
 
     &::before {
-      inset-block-start: var(--admin-space-density-xl, var(--admin-space-xl));
-      inset-inline-start: 1.5rem;
+      inset-block-start: var(--admin-space-l);
+      margin-block-start: 0;
     }
 
     &:focus {

@@ -6,6 +6,7 @@
  */
 
 use Drupal\user\LoginFinalizer;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
@@ -35,6 +36,8 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\Install\TasksInterface;
 use Drupal\Core\Extension\ModuleWeight;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
@@ -212,6 +215,9 @@ function install_state_defaults(): array {
     'config_verified' => FALSE,
     // TRUE when there is a valid database connection.
     'database_verified' => FALSE,
+    // TRUE when a database configured in settings.php failed validation at
+    // the beginning of this request.
+    'configured_database_failed' => FALSE,
     // TRUE when a valid settings.php exists (containing both database
     // connection information and config directory names).
     'settings_verified' => FALSE,
@@ -497,14 +503,25 @@ function install_begin_request($class_loader, &$install_state): void {
   // accessing the database before it is set up yet.)
   drupal_maintenance_theme();
 
-  if (!$install_state['database_verified']) {
+  if (!$install_state['settings_verified']) {
     // Do not install over an existing installation. The call to
     // install_verify_database_ready() will throw an AlreadyInstalledException
     // if this is the case.
-    install_verify_database_ready();
+    try {
+      install_verify_database_ready();
+    }
+    catch (AlreadyInstalledException $e) {
+      throw $e;
+    }
+    catch (InstallerException) {
+      $install_state['configured_database_failed'] = TRUE;
+    }
   }
-  // Verify the last completed task in the database, if there is one.
   $task = install_verify_completed_task();
+  // The install_time state value is set when the installation finishes.
+  if ($task === 'done' || (!empty($task) && \Drupal::state()->get('install_time'))) {
+    throw new AlreadyInstalledException($container->get('string_translation'));
+  }
 
   // Ensure that the active configuration is empty before installation starts.
   if ($install_state['config_verified'] && empty($task)) {
@@ -851,11 +868,19 @@ function install_tasks($install_state): array {
       if (file_exists($profile_install_file)) {
         include_once \Drupal::root() . '/' . $profile_install_file;
       }
-      $function = $install_state['parameters']['profile'] . '_install_tasks';
-      if (function_exists($function)) {
-        $result = $function($install_state);
-        if (is_array($result)) {
-          $tasks += $result;
+      $profile_tasks = install_get_tasks($install_state['profiles'][$profile], $install_state);
+
+      if (!empty($profile_tasks)) {
+        $tasks += $profile_tasks;
+      }
+      else {
+        $function = $install_state['parameters']['profile'] . '_install_tasks';
+        if (function_exists($function)) {
+          @trigger_error('Procedural hook_install_tasks() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
+          $result = $function($install_state);
+          if (is_array($result)) {
+            $tasks += $result;
+          }
         }
       }
     }
@@ -875,9 +900,15 @@ function install_tasks($install_state): array {
   // Allow the installation profile to modify the full list of tasks.
   if (!empty($install_state['parameters']['profile'])) {
     $profile = $install_state['parameters']['profile'];
-    if ($install_state['profiles'][$profile]->load()) {
+    // Load the profile file if it exists so TasksInterface::alter can rely on
+    // functions in it.
+    $install_state['profiles'][$profile]->load();
+    $profile_tasks_altered = install_alter_tasks($install_state['profiles'][$profile], $tasks, $install_state);
+
+    if (!$profile_tasks_altered) {
       $function = $install_state['parameters']['profile'] . '_install_tasks_alter';
       if (function_exists($function)) {
+        @trigger_error('Procedural hook_install_tasks_alter() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use TasksInterface instead. See https://www.drupal.org/node/3623397', E_USER_DEPRECATED);
         $function($tasks, $install_state);
       }
     }
@@ -1154,8 +1185,9 @@ function install_verify_database_settings($site_path) {
  * Verify that the database is ready (no existing Drupal installation).
  *
  * @throws \Drupal\Core\Installer\Exception\AlreadyInstalledException
- *   Thrown when the database already has a table that would be created by
- *   installing the System module.
+ *   Thrown when the database already has a Drupal key_value table.
+ * @throws \Drupal\Core\Installer\Exception\InstallerException
+ *   Thrown when the database cannot be checked.
  */
 function install_verify_database_ready(): void {
   $system_schema = system_schema();
@@ -1166,9 +1198,8 @@ function install_verify_database_ready(): void {
     try {
       $existing_install = Database::getConnection()->schema()->tableExists($table);
     }
-    // Do not trigger an error if the database query fails, since the database
-    // might not be set up yet.
     catch (\Exception) {
+      throw new InstallerException('The configured database could not be verified.', 'Requirements problem');
     }
   }
   if ($existing_install) {
@@ -1551,12 +1582,26 @@ function install_load_profile(&$install_state): void {
 /**
  * Performs a full bootstrap of Drupal during installation.
  */
-function install_bootstrap_full(): void {
+function install_bootstrap_full(&$install_state): void {
   // Store the session on the request object and start it.
   /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
   $session = \Drupal::service('session');
   \Drupal::request()->setSession($session);
   $session->start();
+
+  // Only the browser session that reached this point first can continue the
+  // installation.
+  if ($install_state['interactive']) {
+    $hash = \Drupal::state()->get('install_session_token');
+    if ($hash === NULL) {
+      $token = Crypt::randomBytesBase64();
+      $session->set('install_session_token', $token);
+      \Drupal::state()->set('install_session_token', Crypt::hashBase64($token));
+    }
+    elseif (!hash_equals($hash, Crypt::hashBase64((string) $session->get('install_session_token')))) {
+      throw new InstallerException('The installation can only be continued in the browser session that started it.', 'Access denied');
+    }
+  }
 }
 
 /**
@@ -1839,6 +1884,8 @@ function install_finished(&$install_state): void {
 
   // Record when this install ran.
   \Drupal::state()->set('install_time', \Drupal::time()->getRequestTime());
+  \Drupal::state()->delete('install_session_token');
+  \Drupal::request()->getSession()->remove('install_session_token');
 }
 
 /**
@@ -2070,8 +2117,8 @@ function install_check_requirements($install_state) {
     if (drupal_verify_install_file($site_path, FILE_EXIST, 'dir')) {
       if (drupal_verify_install_file($file, FILE_EXIST)) {
         // If it does, make sure it is writable.
-        $readable = drupal_verify_install_file($file, FILE_READABLE);
-        $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+        $readable = drupal_verify_install_file($file, FILE_READABLE, auto_fix: FALSE);
+        $writable = drupal_verify_install_file($file, FILE_WRITABLE, auto_fix: FALSE);
         $exists = TRUE;
       }
     }
@@ -2104,8 +2151,8 @@ function install_check_requirements($install_state) {
         // keep the file in place. Additionally, this situation also occurs when
         // the test runner is being run be different user than the webserver.
         if (fileowner($default_file) === fileowner($file) || DRUPAL_TEST_IN_CHILD_SITE) {
-          $readable = drupal_verify_install_file($file, FILE_READABLE);
-          $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+          $readable = drupal_verify_install_file($file, FILE_READABLE, auto_fix: FALSE);
+          $writable = drupal_verify_install_file($file, FILE_WRITABLE, auto_fix: FALSE);
           $exists = TRUE;
         }
         // If $file and $default_file have different owners, this probably means
@@ -2129,8 +2176,8 @@ function install_check_requirements($install_state) {
           $exists = !$deleted;
           if ($exists) {
             $settings_file_ownership_error = TRUE;
-            $readable = drupal_verify_install_file($file, FILE_READABLE);
-            $writable = drupal_verify_install_file($file, FILE_WRITABLE);
+            $readable = drupal_verify_install_file($file, FILE_READABLE, auto_fix: FALSE);
+            $writable = drupal_verify_install_file($file, FILE_WRITABLE, auto_fix: FALSE);
           }
         }
       }
@@ -2221,6 +2268,14 @@ function install_check_requirements($install_state) {
         ];
       }
     }
+  }
+  if ($install_state['configured_database_failed'] && !isset($requirements['database_install_errors'])) {
+    $requirements['database_install_errors'] = [
+      'title' => t('Database settings'),
+      'value' => t('The configured database could not be verified.'),
+      'description' => t('Check the database connection and try again.'),
+      'severity' => RequirementSeverity::Error,
+    ];
   }
   return $requirements;
 }
@@ -2564,4 +2619,59 @@ function install_recipe_batch(&$install_state) {
   }
 
   return $batch_builder->toArray();
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return array
+ *   The tasks.
+ *
+ * @internal
+ */
+function install_get_tasks(Extension $extension, array &$install_state): array {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $install_tasks = [];
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $install_tasks = $tasks_class->getTasks($install_state);
+  }
+  return $install_tasks;
+}
+
+/**
+ * Checks a profile for install tasks.
+ *
+ * See \Drupal\Core\Extension\Install\TasksInterface for more information.
+ *
+ * @param \Drupal\Core\Extension\Extension $extension
+ *   The extension to check install tasks for.
+ * @param array $install_state
+ *   An array of information about the current installation state.
+ *
+ * @return bool
+ *   Whether tasks were altered.
+ *
+ * @internal
+ */
+function install_alter_tasks(Extension $extension, array &$tasks, array $install_state): bool {
+  assert($extension->getType() === 'profile');
+  $class_name = install_get_fixed_class_name($extension, 'Install/Tasks');
+  $tasks_altered = FALSE;
+  if (class_exists($class_name) && is_subclass_of($class_name, TasksInterface::class)) {
+    $tasks_altered = TRUE;
+    $tasks_class = \Drupal::classResolver($class_name);
+    assert($tasks_class instanceof TasksInterface);
+    $tasks_class->alter($tasks, $install_state);
+  }
+  return $tasks_altered;
 }
